@@ -143,31 +143,31 @@ func UpdateUsersById(m *Users) (err error) {
 	return
 }
 
-func UpdateUsersByEmail(m *Users) (err error) {
-	o := orm.NewOrm()
-	v := Users{Email: m.Email}
-	// ascertain id exists in the database
-	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
-		}
-	}
-	return
-}
+// func UpdateUsersByEmail(m *Users) (err error) {
+// 	o := orm.NewOrm()
+// 	v := Users{Email: m.Email}
+// 	// ascertain id exists in the database
+// 	if err = o.Read(&v); err == nil {
+// 		var num int64
+// 		if num, err = o.Update(m); err == nil {
+// 			fmt.Println("Number of records updated in database:", num)
+// 		}
+// 	}
+// 	return
+// }
 
-func UpdateUsersByMobile(m *Users) (err error) {
-	o := orm.NewOrm()
-	v := Users{Mobile: m.Mobile}
-	// ascertain id exists in the database
-	if err = o.Read(&v); err == nil {
-		var num int64
-		if num, err = o.Update(m); err == nil {
-			fmt.Println("Number of records updated in database:", num)
-		}
-	}
-	return
-}
+// func UpdateUsersByMobile(m *Users) (err error) {
+// 	o := orm.NewOrm()
+// 	v := Users{Mobile: m.Mobile}
+// 	// ascertain id exists in the database
+// 	if err = o.Read(&v); err == nil {
+// 		var num int64
+// 		if num, err = o.Update(m); err == nil {
+// 			fmt.Println("Number of records updated in database:", num)
+// 		}
+// 	}
+// 	return
+// }
 
 // DeleteUsers deletes Users by Id and returns error if
 // the record to be deleted doesn't exist
@@ -213,10 +213,104 @@ func IsExistingUser(email string, mobile string) bool {
 	return u != nil
 }
 
-func ResetPasswordUsingEmail(m *Users) error {
-	return UpdateUsersByEmail(m)
+func VerifyUserAndUpdate(email string, status int8, otp string, uptime int64) (*Users, error) {
+	o := orm.NewOrm()
+
+	tx, err := o.Begin()
+	if err != nil {
+		return nil, err
+	}
+	var data Users
+	if err = tx.QueryTable("users").Filter("email", email).One(&data); err != nil {
+		// Rollback the transaction if there's an error
+		tx.Rollback()
+		return nil, err
+	}
+
+	verify := (otp == data.Otp)
+
+	if !verify {
+		tx.Rollback()
+		return nil, errors.New("Wrong OTP")
+	}
+
+	data.Status = 1
+
+	if _, err := tx.Update(&data); err != nil {
+		// Rollback the transaction if there's an error
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return &data, nil
 }
 
-func ResetPasswordUsingMobile(m *Users) error {
-	return UpdateUsersByMobile(m)
+func SendOtpToUser(email string, otp string, uptime int64) (*Users, error) {
+	o := orm.NewOrm()
+
+	tx, err := o.Begin()
+	if err != nil {
+		return nil, err
+	}
+	var data Users
+	if err = tx.QueryTable("users").Filter("email", email).One(&data); err != nil {
+		// Rollback the transaction if there's an error
+		tx.Rollback()
+		return nil, err
+	}
+
+	data.Otp = otp
+
+	if _, err := tx.Update(&data); err != nil {
+		// Rollback the transaction if there's an error
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return &data, nil
+}
+
+func UserPasswordUpdate(email string, password string, otp string, uptime int64) (*Users, error) {
+	o := orm.NewOrm()
+
+	tx, err := o.Begin()
+	if err != nil {
+		return nil, err
+	}
+	var data Users
+	if err = tx.QueryTable("users").Filter("email", email).One(&data); err != nil {
+		// Rollback the transaction if there's an error
+		tx.Rollback()
+		return nil, err
+	}
+
+	verify := (otp == data.Otp)
+
+	if !verify {
+		tx.Rollback()
+		return nil, errors.New("Wrong OTP")
+	}
+
+	data.Password = password
+	data.UpdatedAt = uptime
+
+	if _, err := tx.Update(&data); err != nil {
+		// Rollback the transaction if there's an error
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return &data, nil
 }

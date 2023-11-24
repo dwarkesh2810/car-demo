@@ -20,7 +20,7 @@ func init() {
 // Run the migrations
 func (m *CarMaster_20231123_155827) Up() {
 	// use m.SQL("CREATE TABLE ...") to make schema update
-	// m.SQL("CREATE TYPE car_types AS ENUM ('sedan', 'hatchback', 'SUV')")
+	m.SQL("CREATE TYPE car_types AS ENUM ('sedan', 'hatchback', 'SUV')")
 	m.SQL("CREATE TABLE car_master(id serial primary key,user_id integer DEFAULT NULL,car_name TEXT NOT NULL,car_image TEXT NOT NULL,make TEXT NOT NULL,model TEXT NOT NULL,car_type car_types NOT NULL,created_at integer DEFAULT NULL, updated_at integer DEFAULT NULL)")
 }
 

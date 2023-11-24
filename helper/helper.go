@@ -2,13 +2,15 @@ package helper
 
 import (
 	"car_demo/conf"
-	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 	"log"
+	"math/rand"
+
 	"net/smtp"
 	"os"
 	"strings"
+	"time"
 
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/beego/beego/v2/server/web/context"
@@ -82,6 +84,12 @@ func GenerateRandomString(s int) (string, error) {
 	return base64.URLEncoding.EncodeToString(b), err
 }
 
+func GenerateOTP() int {
+	rand.Seed(time.Now().UnixNano())
+
+	// Generate a random 6-digit number
+	return rand.Intn(900000) + 10000
+}
 func JsonResponse(c beego.Controller, statusCode int, success int, data interface{}, err string) {
 	var response Response = Response{
 		Success: success,

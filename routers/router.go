@@ -25,7 +25,7 @@ func init() {
 			beego.NSRouter("s", uc, "get:GetAll"),
 			beego.NSRouter("/:id", uc, "get:GetOne;put:Put;delete:Delete"),
 			beego.NSRouter("/login", uc, "post:Login"),
-			beego.NSRouter("/verify", uc, "post:VerifyUser"),
+			// beego.NSRouter("/verify", uc, "post:VerifyUser"),
 			beego.NSRouter("/sendotp", uc, "post:SendOTP"),
 			beego.NSRouter("/verifyotp", uc, "post:VerifyOTP"),
 			beego.NSRouter("/forgot_password", uc, "post:ForgetPassword"),

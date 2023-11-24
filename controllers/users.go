@@ -5,7 +5,6 @@ import (
 	"car_demo/helper"
 	"car_demo/models"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -28,7 +27,7 @@ func (uc *UsersController) URLMapping() {
 	uc.Mapping("Put", uc.Put)
 	uc.Mapping("Delete", uc.Delete)
 	uc.Mapping("Login", uc.Login)
-	uc.Mapping("VerifyUser", uc.VerifyUser)
+	// uc.Mapping("VerifyUser", uc.VerifyUser)
 	uc.Mapping("SendOTP", uc.SendOTP)
 	uc.Mapping("VerifyOTP", uc.VerifyOTP)
 	uc.Mapping("ForgetPassword", uc.ForgetPassword)
@@ -49,11 +48,7 @@ func (uc *UsersController) Post() {
 		return
 	}
 
-	userOTP, err := helper.GenerateRandomString(6)
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "faild to hashed password")
-		return
-	}
+	userOTP := helper.GenerateOTP()
 
 	up, err := helper.HashData(v.Password)
 
@@ -62,20 +57,16 @@ func (uc *UsersController) Post() {
 		return
 	}
 
-	hOtp, err := helper.HashData(userOTP)
-
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "faild to hashed OTP")
-		return
-	}
-
 	v.Password = up
 
-	v.Otp = hOtp
+	v.Otp = strconv.Itoa(userOTP)
+
+	v.CreatedAt = time.Now().Unix()
+	v.UpdatedAt = time.Now().Unix()
 
 	if _, err := models.AddUsers(&v); err == nil {
 		helper.JsonResponse(uc.Controller, http.StatusCreated, 1, v, "")
-		helper.SendMail(v.Email, conf.EnvConfig.MailSubject, userOTP)
+		helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
 		return
 	} else {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
@@ -266,51 +257,51 @@ func (uc *UsersController) Login() {
 }
 
 // func ForgotPassword()
-func (uc *UsersController) ResetPassword() {
-	var v struct {
-		Email           string `form:"email" json:"email"`
-		CurrentPassword string `form:"current_password" json:"current_password"`
-		NewPassword     string `form:"new_password" json:"new_password"`
-	}
+// func (uc *UsersController) ResetPassword() {
+// 	var v struct {
+// 		Email           string `form:"email" json:"email"`
+// 		CurrentPassword string `form:"current_password" json:"current_password"`
+// 		NewPassword     string `form:"new_password" json:"new_password"`
+// 	}
 
-	if err := uc.ParseForm(&v); err != nil {
-		// Handle error if parsing fails
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
-		return
-	}
+// 	if err := uc.ParseForm(&v); err != nil {
+// 		// Handle error if parsing fails
+// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
+// 		return
+// 	}
 
-	u, err := models.FindUserByEmail(v.Email)
+// 	u, err := models.FindUserByEmail(v.Email)
 
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
-		return
-	}
+// 	if err != nil {
+// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
+// 		return
+// 	}
 
-	ok, _ := helper.VerifyHashedData(v.CurrentPassword, u.Password)
+// 	ok, _ := helper.VerifyHashedData(v.CurrentPassword, u.Password)
 
-	if !ok {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "email and current Password didn't match")
-		return
-	}
+// 	if !ok {
+// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "email and current Password didn't match")
+// 		return
+// 	}
 
-	up, err := helper.HashData(v.NewPassword)
+// 	up, err := helper.HashData(v.NewPassword)
 
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "faild to hashed password")
-		return
-	}
-	u.Password = up
+// 	if err != nil {
+// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "faild to hashed password")
+// 		return
+// 	}
+// 	u.Password = up
 
-	err = models.ResetPasswordUsingEmail(u)
+// 	// err = models.ResetPasswordUsingEmail(u)
 
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
-		return
-	}
+// 	// if err != nil {
+// 	// 	helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
+// 	// 	return
+// 	// }
 
-	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "OK", "")
+// 	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "OK", "")
 
-}
+// }
 
 func (uc *UsersController) ForgetPassword() {
 	var v struct {
@@ -324,21 +315,6 @@ func (uc *UsersController) ForgetPassword() {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
 		return
 	}
-
-	u, err := models.FindUserByEmail(v.Email)
-
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
-		return
-	}
-
-	ok, _ := helper.VerifyHashedData(v.Otp, u.Otp)
-
-	if !ok {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "OTP didn't match")
-		return
-	}
-
 	up, err := helper.HashData(v.NewPassword)
 
 	if err != nil {
@@ -346,50 +322,48 @@ func (uc *UsersController) ForgetPassword() {
 		return
 	}
 
-	u.Password = up
-
-	models.UpdateUsersByEmail(u)
+	models.UserPasswordUpdate(v.Email, up, v.Otp, time.Now().Unix())
 
 	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "Password updated", "")
 
 }
 
-func (uc *UsersController) VerifyUser() {
-	var v struct {
-		Email string `form:"email" json:"email"`
-		Otp   string `form:"otp" json:"otp"`
-	}
+// func (uc *UsersController) VerifyUser() {
+// 	var v struct {
+// 		Email string `form:"email" json:"email"`
+// 		Otp   string `form:"otp" json:"otp"`
+// 	}
 
-	if err := uc.ParseForm(&v); err != nil {
-		// Handle error if parsing fails
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
-		return
-	}
+// 	if err := uc.ParseForm(&v); err != nil {
+// 		// Handle error if parsing fails
+// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
+// 		return
+// 	}
 
-	u, err := models.FindUserByEmail(v.Email)
+// 	u, err := models.FindUserByEmail(v.Email)
 
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
-		return
-	}
+// 	if err != nil {
+// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
+// 		return
+// 	}
 
-	ok, _ := helper.VerifyHashedData(v.Otp, u.Otp)
+// 	ok, _ := helper.VerifyHashedData(v.Otp, u.Otp)
 
-	if !ok {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "OTP didn't match")
-		return
-	}
+// 	if !ok {
+// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "OTP didn't match")
+// 		return
+// 	}
 
-	u.Status = 1
+// 	u.Status = 1
 
-	models.UpdateUsersByEmail(u)
+// 	models.UpdateUsersByEmail(u)
 
-	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "verified", "")
-}
+// 	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "verified", "")
+// }
 
 func (uc *UsersController) SendOTP() {
 	var v struct {
-		Email string `form:"email"`
+		Email string `form:"email" json:"email"`
 	}
 
 	if err := uc.ParseForm(&v); err != nil {
@@ -398,37 +372,22 @@ func (uc *UsersController) SendOTP() {
 		return
 	}
 
-	userOTP, err := helper.GenerateRandomString(6)
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "faild to hashed password")
-		return
-	}
+	userOTP := helper.GenerateOTP()
 
-	hOtp, err := helper.HashData(userOTP)
+	data, err := models.SendOtpToUser(v.Email, strconv.Itoa(userOTP), time.Now().Unix())
 
 	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "faild to hashed OTP")
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "")
 		return
 	}
-
-	u, err := models.FindUserByEmail(v.Email)
-
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
-		return
-	}
-
-	u.Otp = hOtp
-
-	sent := helper.SendMail(v.Email, conf.EnvConfig.MailSubject, userOTP)
+	sent := helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
 
 	if !sent {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "failed to send OTP")
 		return
 	}
 
-	models.UpdateUsersByEmail(u)
-	helper.JsonResponse(uc.Controller, http.StatusOK, 1, fmt.Sprintf("%s", userOTP), "")
+	helper.JsonResponse(uc.Controller, http.StatusOK, 1, data, "")
 }
 
 func (uc *UsersController) VerifyOTP() {
@@ -439,23 +398,14 @@ func (uc *UsersController) VerifyOTP() {
 
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: ")
 		return
 	}
-
-	u, err := models.FindUserByEmail(v.Email)
+	data, err := models.VerifyUserAndUpdate(v.Email, 1, v.Otp, time.Now().Unix())
 
 	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
 		return
 	}
-
-	ok, _ := helper.VerifyHashedData(v.Otp, u.Otp)
-
-	if !ok {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "OTP didn't match")
-		return
-	}
-
-	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "Verified", "")
+	helper.JsonResponse(uc.Controller, http.StatusOK, 1, data, "")
 }
