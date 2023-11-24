@@ -1,0 +1,7 @@
+\.env
+bin/
+conf/app.conf
+
+\*.env
+
+app.env
