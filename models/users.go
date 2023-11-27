@@ -1,10 +1,12 @@
 package models
 
 import (
+	"car_demo/helper"
 	"errors"
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/beego/beego/v2/client/orm"
 )
@@ -143,32 +145,6 @@ func UpdateUsersById(m *Users) (err error) {
 	return
 }
 
-// func UpdateUsersByEmail(m *Users) (err error) {
-// 	o := orm.NewOrm()
-// 	v := Users{Email: m.Email}
-// 	// ascertain id exists in the database
-// 	if err = o.Read(&v); err == nil {
-// 		var num int64
-// 		if num, err = o.Update(m); err == nil {
-// 			fmt.Println("Number of records updated in database:", num)
-// 		}
-// 	}
-// 	return
-// }
-
-// func UpdateUsersByMobile(m *Users) (err error) {
-// 	o := orm.NewOrm()
-// 	v := Users{Mobile: m.Mobile}
-// 	// ascertain id exists in the database
-// 	if err = o.Read(&v); err == nil {
-// 		var num int64
-// 		if num, err = o.Update(m); err == nil {
-// 			fmt.Println("Number of records updated in database:", num)
-// 		}
-// 	}
-// 	return
-// }
-
 // DeleteUsers deletes Users by Id and returns error if
 // the record to be deleted doesn't exist
 func DeleteUsers(id int64) (err error) {
@@ -213,7 +189,7 @@ func IsExistingUser(email string, mobile string) bool {
 	return u != nil
 }
 
-func VerifyUserAndUpdate(email string, status int8, otp string, uptime int64) (*Users, error) {
+func VerifyUserAndUpdate(email string, otp string) (*Users, error) {
 	o := orm.NewOrm()
 
 	tx, err := o.Begin()
@@ -249,7 +225,7 @@ func VerifyUserAndUpdate(email string, status int8, otp string, uptime int64) (*
 	return &data, nil
 }
 
-func SendOtpToUser(email string, otp string, uptime int64) (*Users, error) {
+func SendOtpToUser(email string, otp string) (*Users, error) {
 	o := orm.NewOrm()
 
 	tx, err := o.Begin()
@@ -264,6 +240,7 @@ func SendOtpToUser(email string, otp string, uptime int64) (*Users, error) {
 	}
 
 	data.Otp = otp
+	data.UpdatedAt = time.Now().UnixMilli()
 
 	if _, err := tx.Update(&data); err != nil {
 		// Rollback the transaction if there's an error
@@ -278,7 +255,7 @@ func SendOtpToUser(email string, otp string, uptime int64) (*Users, error) {
 	return &data, nil
 }
 
-func UserPasswordUpdate(email string, password string, otp string, uptime int64) (*Users, error) {
+func UserPasswordUpdate(email string, password string, otp string) (*Users, error) {
 	o := orm.NewOrm()
 
 	tx, err := o.Begin()
@@ -300,7 +277,44 @@ func UserPasswordUpdate(email string, password string, otp string, uptime int64)
 	}
 
 	data.Password = password
-	data.UpdatedAt = uptime
+	data.UpdatedAt = time.Now().Unix()
+
+	if _, err := tx.Update(&data); err != nil {
+		// Rollback the transaction if there's an error
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return &data, nil
+}
+
+func UserPasswordReset(email, currentPassword, NewPassword string) (*Users, error) {
+	o := orm.NewOrm()
+
+	tx, err := o.Begin()
+	if err != nil {
+		return nil, err
+	}
+	var data Users
+	if err = tx.QueryTable("users").Filter("email", email).One(&data); err != nil {
+		// Rollback the transaction if there's an error
+		tx.Rollback()
+		return nil, err
+	}
+
+	verify, _ := helper.VerifyHashedData(data.Password, currentPassword)
+
+	if !verify {
+		tx.Rollback()
+		return nil, errors.New("Wrong Password")
+	}
+
+	data.Password = NewPassword
+	data.UpdatedAt = time.Now().Unix()
 
 	if _, err := tx.Update(&data); err != nil {
 		// Rollback the transaction if there's an error

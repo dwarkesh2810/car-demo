@@ -256,52 +256,51 @@ func (uc *UsersController) Login() {
 	helper.JsonResponse(uc.Controller, http.StatusOK, 1, map[string]interface{}{"data": &us, "token": accessToken}, "")
 }
 
-// func ForgotPassword()
-// func (uc *UsersController) ResetPassword() {
-// 	var v struct {
-// 		Email           string `form:"email" json:"email"`
-// 		CurrentPassword string `form:"current_password" json:"current_password"`
-// 		NewPassword     string `form:"new_password" json:"new_password"`
-// 	}
+func (uc *UsersController) ResetPassword() {
+	var v struct {
+		Email           string `form:"email" json:"email"`
+		CurrentPassword string `form:"current_password" json:"current_password"`
+		NewPassword     string `form:"new_password" json:"new_password"`
+	}
 
-// 	if err := uc.ParseForm(&v); err != nil {
-// 		// Handle error if parsing fails
-// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
-// 		return
-// 	}
+	if err := uc.ParseForm(&v); err != nil {
+		// Handle error if parsing fails
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
+		return
+	}
 
-// 	u, err := models.FindUserByEmail(v.Email)
+	u, err := models.FindUserByEmail(v.Email)
 
-// 	if err != nil {
-// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
-// 		return
-// 	}
+	if err != nil {
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
+		return
+	}
 
-// 	ok, _ := helper.VerifyHashedData(v.CurrentPassword, u.Password)
+	ok, _ := helper.VerifyHashedData(v.CurrentPassword, u.Password)
 
-// 	if !ok {
-// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "email and current Password didn't match")
-// 		return
-// 	}
+	if !ok {
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "email and current Password didn't match")
+		return
+	}
 
-// 	up, err := helper.HashData(v.NewPassword)
+	up, err := helper.HashData(v.NewPassword)
 
-// 	if err != nil {
-// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "faild to hashed password")
-// 		return
-// 	}
-// 	u.Password = up
+	if err != nil {
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "faild to hashed password")
+		return
+	}
+	u.Password = up
 
-// 	// err = models.ResetPasswordUsingEmail(u)
+	// err = models.ResetPasswordUsingEmail(u)
 
-// 	// if err != nil {
-// 	// 	helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
-// 	// 	return
-// 	// }
+	// if err != nil {
+	// 	helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
+	// 	return
+	// }
 
-// 	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "OK", "")
+	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "OK", "")
 
-// }
+}
 
 func (uc *UsersController) ForgetPassword() {
 	var v struct {
@@ -322,44 +321,11 @@ func (uc *UsersController) ForgetPassword() {
 		return
 	}
 
-	models.UserPasswordUpdate(v.Email, up, v.Otp, time.Now().Unix())
+	models.UserPasswordUpdate(v.Email, up, v.Otp)
 
 	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "Password updated", "")
 
 }
-
-// func (uc *UsersController) VerifyUser() {
-// 	var v struct {
-// 		Email string `form:"email" json:"email"`
-// 		Otp   string `form:"otp" json:"otp"`
-// 	}
-
-// 	if err := uc.ParseForm(&v); err != nil {
-// 		// Handle error if parsing fails
-// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
-// 		return
-// 	}
-
-// 	u, err := models.FindUserByEmail(v.Email)
-
-// 	if err != nil {
-// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
-// 		return
-// 	}
-
-// 	ok, _ := helper.VerifyHashedData(v.Otp, u.Otp)
-
-// 	if !ok {
-// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "OTP didn't match")
-// 		return
-// 	}
-
-// 	u.Status = 1
-
-// 	models.UpdateUsersByEmail(u)
-
-// 	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "verified", "")
-// }
 
 func (uc *UsersController) SendOTP() {
 	var v struct {
@@ -374,7 +340,7 @@ func (uc *UsersController) SendOTP() {
 
 	userOTP := helper.GenerateOTP()
 
-	data, err := models.SendOtpToUser(v.Email, strconv.Itoa(userOTP), time.Now().Unix())
+	data, err := models.SendOtpToUser(v.Email, strconv.Itoa(userOTP))
 
 	if err != nil {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "")
@@ -401,7 +367,7 @@ func (uc *UsersController) VerifyOTP() {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: ")
 		return
 	}
-	data, err := models.VerifyUserAndUpdate(v.Email, 1, v.Otp, time.Now().Unix())
+	data, err := models.VerifyUserAndUpdate(v.Email, v.Otp)
 
 	if err != nil {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
