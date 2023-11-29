@@ -50,6 +50,8 @@ func (c *Car_masterController) Post() {
 	imgPath, err := helper.GetFileAndStore(c.Controller, "imageFile", "cars", string(v.CarType))
 
 	if err != nil {
+
+		log.Print("1111111111111111111111111111111111111111111111")
 		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
 		return
 	}

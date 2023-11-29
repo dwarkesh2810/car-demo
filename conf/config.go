@@ -1,6 +1,8 @@
 package conf
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	JwtSecret        string `mapstructure:"SECRET"`

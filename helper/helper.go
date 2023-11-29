@@ -2,7 +2,6 @@ package helper
 
 import (
 	"car_demo/conf"
-	"encoding/base64"
 	"fmt"
 	"log"
 	"math/rand"
@@ -14,7 +13,6 @@ import (
 
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/beego/beego/v2/server/web/context"
-	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -45,13 +43,6 @@ func VerifyHashedData(hashedString string, dataString string) (bool, string) {
 	return check, msg
 }
 
-func LoadEnvVariable() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-}
-
 func GetTokenFromHeader(c *context.Context) (string, error) {
 
 	token := c.Input.Header("Authorization")
@@ -66,22 +57,6 @@ func GetTokenFromHeader(c *context.Context) (string, error) {
 
 	return authToken, nil
 
-}
-
-func GenerateRandomBytes(n int) ([]byte, error) {
-	b := make([]byte, n)
-	_, err := rand.Read(b)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return b, nil
-}
-
-func GenerateRandomString(s int) (string, error) {
-	b, err := GenerateRandomBytes(s)
-	return base64.URLEncoding.EncodeToString(b), err
 }
 
 func GenerateOTP() int {
@@ -134,7 +109,6 @@ func SendMail(to string, subject, body string) bool {
 	// SMTP server configuration
 	smtpHost := conf.EnvConfig.SmtpHost
 	smtpPort := conf.EnvConfig.SmtpPort
-
 	// Message construction
 	message := []byte("Subject: " + subject + "\r\n" + "\r\n" + body)
 

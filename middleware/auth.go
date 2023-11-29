@@ -11,12 +11,13 @@ import (
 	"car_demo/conf"
 	"car_demo/helper"
 	"car_demo/models"
+
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/beego/beego/v2/server/web/context"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func Auth(c *context.Context) {

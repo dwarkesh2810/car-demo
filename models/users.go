@@ -2,9 +2,11 @@ package models
 
 import (
 	"car_demo/helper"
+	"car_demo/request"
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -18,12 +20,11 @@ type Users struct {
 	Email     string `orm:"size(128)" json:"email" form:"email"`
 	Mobile    string `json:"mobile" form:"mobile"`
 	Password  string `orm:"size(128)" json:"password" form:"password"`
-	Status    int8   `json:"status" form:"status"`
+	Status    int    `orm:"" json:"status" form:"status"`
 	Role      string `orm:"size(20)" json:"role" form:"role"`
 	Otp       string `orm:"size(20)" json:"otp" form:"otp"`
 	CreatedAt int64
 	UpdatedAt int64
-	DeletedAt int64
 }
 
 func init() {
@@ -32,13 +33,29 @@ func init() {
 
 // AddUsers insert a new Users into database and returns
 // last inserted Id on success.
-func AddUsers(m *Users) (int64, error) {
+func AddUsers(m *request.CreateUserRequest) (int64, error) {
 	o := orm.NewOrm()
-	isExist := IsExistingUser(m.Email, m.Mobile)
-	if isExist {
-		return 0, errors.New("user already Exist")
+
+	otp := helper.GenerateOTP()
+	up, err := helper.HashData(m.Password)
+	if err != nil {
+
+		return 0, err
 	}
-	id, err := o.Insert(m)
+
+	user := Users{
+		FirstName: m.FirstName,
+		LastName:  m.LastName,
+		Mobile:    m.Mobile,
+		Email:     m.Email,
+		Status:    0,
+		Role:      m.Role,
+		Password:  up,
+		Otp:       strconv.Itoa(otp),
+		CreatedAt: time.Now().UnixMilli(),
+	}
+
+	id, err := o.Insert(&user)
 	if err != nil {
 		return 0, errors.New("Unexpected database error" + err.Error())
 	}
@@ -132,13 +149,20 @@ func GetAllUsers(query map[string]string, fields []string, sortby []string, orde
 
 // UpdateUsers updates Users by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateUsersById(m *Users) (err error) {
+func UpdateUsersById(m *request.UserRequest) (err error) {
 	o := orm.NewOrm()
 	v := Users{Id: m.Id}
+
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
+
+		v.FirstName = m.FirstName
+		v.LastName = m.LastName
+		v.Email = m.Email
+		v.Mobile = m.Mobile
+		v.Role = m.Role
 		var num int64
-		if num, err = o.Update(m); err == nil {
+		if num, err = o.Update(&v); err == nil {
 			fmt.Println("Number of records updated in database:", num)
 		}
 	}

@@ -4,7 +4,9 @@ import (
 	"car_demo/conf"
 	"car_demo/helper"
 	"car_demo/models"
+	"car_demo/request"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -41,32 +43,22 @@ func (uc *UsersController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (uc *UsersController) Post() {
-	var v models.Users
+	var v request.CreateUserRequest
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
 		return
 	}
 
-	userOTP := helper.GenerateOTP()
-
-	up, err := helper.HashData(v.Password)
-
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "faild to hashed password")
-		return
+	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
+	isExist := models.IsExistingUser(v.Email, v.Mobile)
+	if isExist {
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "User already exist")
 	}
-
-	v.Password = up
-
-	v.Otp = strconv.Itoa(userOTP)
-
-	v.CreatedAt = time.Now().Unix()
-	v.UpdatedAt = time.Now().Unix()
 
 	if _, err := models.AddUsers(&v); err == nil {
 		helper.JsonResponse(uc.Controller, http.StatusCreated, 1, v, "")
-		helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
+		// helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
 		return
 	} else {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
@@ -111,7 +103,7 @@ func (uc *UsersController) GetAll() {
 	var sortby []string
 	var order []string
 	var query = make(map[string]string)
-	var limit int64 = 10
+	var limit int64 = 1
 	var offset int64
 
 	// fields: col1,col2,entity.col3
@@ -166,10 +158,16 @@ func (uc *UsersController) GetAll() {
 // @Failure 403 :id is not int
 // @router /:id [put]
 func (uc *UsersController) Put() {
-	idStr := uc.Ctx.Input.Param(":id")
-	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v := models.Users{Id: id}
-	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
+	var v request.UserRequest
+	if err := uc.ParseForm(&v); err != nil {
+		// Handle error if parsing fails
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
+		return
+	}
+
+	// json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
+
+	log.Print(v)
 	if err := models.UpdateUsersById(&v); err == nil {
 		helper.JsonResponse(uc.Controller, http.StatusOK, 1, "ok", "")
 		return
