@@ -35,26 +35,28 @@ func (c *Car_masterController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *Car_masterController) Post() {
+	log.Print("1111111111111111111111111111111111")
 	ctx := c.Ctx.Input.GetData("user")
-
+	log.Print("222222222222222222222222222222222222222222222222222222222")
 	uid := ctx.(*models.Users).Id
-	log.Print(uid)
+	log.Print("333333333333333333333333333333333333333333333333333333333")
 	var v models.Car_master
-	// json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+	log.Print("333333333333333333333333333333333333333333333333333333333")
 
 	if err := c.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
 		c.Ctx.WriteString("Error while parsing form data: " + err.Error())
 		return
 	}
-	imgPath, err := helper.GetFileAndStore(c.Controller, "imageFile", "cars", string(v.CarType))
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+	// imgPath, err := helper.GetFileAndStore(c.Controller, "imageFile", "cars", string(v.CarType))
 
-	if err != nil {
+	// if err != nil {
+	// 	helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
+	// 	return
+	// }
 
-		log.Print("1111111111111111111111111111111111111111111111")
-		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
-		return
-	}
+	imgPath := "assets/img/cars/sedan/HuracanModelImage.jpg"
 
 	v.CarImage = imgPath
 	v.CreatedAt = int(time.Now().Unix())

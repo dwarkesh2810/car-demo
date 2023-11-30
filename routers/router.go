@@ -21,10 +21,10 @@ func init() {
 	cc := &controllers.Car_masterController{}
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/user",
-			beego.NSRouter("/users", uc, "get:GetAll"),
+			beego.NSRouter("/", uc, "get:GetAll"),
 			beego.NSRouter("/create", uc, "post:Post"),
 
-			// beego.NSRouter("/:id", uc, "get:GetOne;delete:Delete"),
+			beego.NSRouter("/:id", uc, "get:GetOne"),
 			beego.NSRouter("/login", uc, "post:Login"),
 			beego.NSRouter("/sendotp", uc, "post:SendOTP"),
 			beego.NSRouter("/verifyotp", uc, "post:VerifyOTP"),
@@ -48,6 +48,4 @@ func init() {
 		),
 	)
 	beego.AddNamespace(ns, n1)
-
-	beego.Router("/users", uc, "get:GetAll")
 }

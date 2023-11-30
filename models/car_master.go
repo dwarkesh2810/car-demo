@@ -12,10 +12,10 @@ import (
 type Car_master struct {
 	Id        int64   `orm:"auto"`
 	UserId    int64   `json:"user_id"`
-	CarName   string  `orm:"size(50)" form:"car_name"`
-	CarImage  string  `orm:"size(200)" json:"car_image"`
-	Make      string  `orm:"size(20)" form:"make"`
-	Model     string  `orm:"size(20)" form:"model"`
+	CarName   string  `orm:"size(50)" form:"car_name" json:"car_name"`
+	CarImage  string  `orm:"size(200)" json:"car_image" `
+	Make      string  `orm:"size(20)" form:"make" json:"make"`
+	Model     string  `orm:"size(20)" form:"model" json:"model"`
 	CarType   CarType `orm:"size(15)" form:"car_type" json:"car_type"`
 	CreatedAt int
 	UpdatedAt int

@@ -18,3 +18,9 @@ type UserRequest struct {
 	Password  string ` json:"password" form:"password"`
 	Role      string ` json:"role" form:"role"`
 }
+
+type UserLoginRequest struct {
+	Email    string `json:"email,omitempty" form:"email"`
+	Mobile   string `json:"mobile,omitempty" form:"mobile"`
+	Password string `json:"password" form:"password"`
+}

@@ -51,13 +51,15 @@ func (uc *UsersController) Post() {
 	}
 
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
+
 	isExist := models.IsExistingUser(v.Email, v.Mobile)
 	if isExist {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "User already exist")
+		return
 	}
 
-	if _, err := models.AddUsers(&v); err == nil {
-		helper.JsonResponse(uc.Controller, http.StatusCreated, 1, v, "")
+	if u, err := models.AddUsers(&v); err == nil {
+		helper.JsonResponse(uc.Controller, http.StatusCreated, 1, u, "")
 		// helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
 		return
 	} else {
@@ -76,8 +78,11 @@ func (uc *UsersController) Post() {
 func (uc *UsersController) GetOne() {
 	idStr := uc.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
+
+	log.Print("11111111111111111111111111111111111111111111111")
 	v, err := models.GetUsersById(id)
 	if err != nil {
+		log.Print("111111111111111111111111111112222222222222222222222222222222222222222222222222222222222111111111111111111")
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
 		return
 	} else {
@@ -199,14 +204,15 @@ func (uc *UsersController) Delete() {
 func (uc *UsersController) Login() {
 	var err error
 	var us *models.Users
-	var v models.Users
+	var v request.UserLoginRequest
 
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
 		return
 	}
-	// json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
+	log.Print(uc.Ctx.Input.RequestBody)
+	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 	if v.Email == "" {
 		if v.Mobile == "" {
 			helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Mobile or mail requires")
@@ -332,13 +338,15 @@ func (uc *UsersController) SendOTP() {
 
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
+		log.Print("1111111111111111111111111111111111111111111111111")
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
 		return
 	}
+	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 
 	userOTP := helper.GenerateOTP()
 
-	data, err := models.SendOtpToUser(v.Email, strconv.Itoa(userOTP))
+	_, err := models.SendOtpToUser(v.Email, strconv.Itoa(userOTP))
 
 	if err != nil {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "")
@@ -351,7 +359,7 @@ func (uc *UsersController) SendOTP() {
 		return
 	}
 
-	helper.JsonResponse(uc.Controller, http.StatusOK, 1, data, "")
+	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "Otp Sent Successfully", "")
 }
 
 func (uc *UsersController) VerifyOTP() {
@@ -365,6 +373,7 @@ func (uc *UsersController) VerifyOTP() {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: ")
 		return
 	}
+	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 	data, err := models.VerifyUserAndUpdate(v.Email, v.Otp)
 
 	if err != nil {
