@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"car_demo/conf"
+	"car_demo/dto"
 	"car_demo/helper"
 	"car_demo/models"
 	"car_demo/request"
@@ -63,7 +64,7 @@ func (uc *UsersController) Post() {
 		// helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
 
 		T, _ := models.LastInsertedUser()
-		helper.JsonResponse(uc.Controller, http.StatusCreated, 1, T, "")
+		helper.JsonResponse(uc.Controller, http.StatusCreated, 1, dto.DtOUserResponse(T), "")
 		return
 	} else {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
@@ -81,15 +82,12 @@ func (uc *UsersController) Post() {
 func (uc *UsersController) GetOne() {
 	idStr := uc.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
-
-	log.Print("11111111111111111111111111111111111111111111111")
 	v, err := models.GetUsersById(id)
 	if err != nil {
-		log.Print("111111111111111111111111111112222222222222222222222222222222222222222222222222222222222111111111111111111")
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
 		return
 	} else {
-		helper.JsonResponse(uc.Controller, http.StatusOK, 1, v, "")
+		helper.JsonResponse(uc.Controller, http.StatusOK, 1, dto.DtOUserResponse(v), "")
 		return
 	}
 }

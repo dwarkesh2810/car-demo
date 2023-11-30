@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strconv"
 	"strings"
 	"time"
 
@@ -36,7 +35,6 @@ func init() {
 func AddUsers(m *request.CreateUserRequest) (int64, error) {
 	o := orm.NewOrm()
 
-	otp := helper.GenerateOTP()
 	up, err := helper.HashData(m.Password)
 	if err != nil {
 
@@ -51,7 +49,6 @@ func AddUsers(m *request.CreateUserRequest) (int64, error) {
 		Status:    0,
 		Role:      m.Role,
 		Password:  up,
-		Otp:       strconv.Itoa(otp),
 		CreatedAt: time.Now().UnixMilli(),
 	}
 

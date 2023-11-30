@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"car_demo/dto"
 	"car_demo/helper"
 	"car_demo/models"
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -35,13 +35,9 @@ func (c *Car_masterController) URLMapping() {
 // @Failure 403 body is empty
 // @router / [post]
 func (c *Car_masterController) Post() {
-	log.Print("1111111111111111111111111111111111")
 	ctx := c.Ctx.Input.GetData("user")
-	log.Print("222222222222222222222222222222222222222222222222222222222")
 	uid := ctx.(*models.Users).Id
-	log.Print("333333333333333333333333333333333333333333333333333333333")
 	var v models.Car_master
-	log.Print("333333333333333333333333333333333333333333333333333333333")
 
 	if err := c.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
@@ -66,7 +62,7 @@ func (c *Car_masterController) Post() {
 	switch v.CarType {
 	case models.Hatchback, models.SUV, models.Sedan:
 		if _, err := models.AddCar_master(&v); err == nil {
-			helper.JsonResponse(c.Controller, http.StatusCreated, 1, v, "")
+			helper.JsonResponse(c.Controller, http.StatusCreated, 1, dto.DtOAddCarResponse(&v), "")
 			return
 		} else {
 			helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())

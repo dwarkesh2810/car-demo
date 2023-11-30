@@ -1,16 +1,13 @@
 package test
 
 import (
-	"bytes"
 	"car_demo/controllers"
 
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	// "github.com/beego/beego/v2/core/logs"
 
-	beego "github.com/beego/beego/v2/server/web"
 	_ "github.com/beego/beego/v2/server/web/context"
 	_ "github.com/lib/pq"
 	. "github.com/smartystreets/goconvey/convey"
@@ -22,16 +19,13 @@ func TestCreateUser(t *testing.T) {
 	t.Run("CreateUser", func(t *testing.T) {
 		Ctrl := &controllers.UsersController{}
 		endPoint := "/v1/user/create"
-
 		var jsonStr = []byte(`{"first_name":"Dwarkesh", "last_name":"Patel", "email":"dwarkesh00071@gmail.com", "mobile":"12343241343543", "password":"1234567", "role":"user"}`)
 
-		req, _ := http.NewRequest("POST", endPoint, bytes.NewBuffer(jsonStr))
+		token := ""
+		method := "POST"
+		mappedMethod := "Post"
 
-		w := httptest.NewRecorder()
-
-		router := beego.NewControllerRegister()
-		router.Add(endPoint, Ctrl, beego.WithRouterMethods(Ctrl, "post:Post"))
-		router.ServeHTTP(w, req)
+		w := TestRouters(Ctrl, endPoint, token, method, mappedMethod, jsonStr, false)
 
 		Convey("Subject:Create User Endpoint\n", t, func() {
 			Convey("Status Code Should Be 201", func() {
@@ -73,12 +67,12 @@ func TestSendOTP(t *testing.T) {
 	t.Run("SendOTP", func(t *testing.T) {
 		Ctrl := &controllers.UsersController{}
 		endPoints := "/v1/user/sendotp"
-		var jsonStrs = []byte(`{"email":"dwarkesh0007@gmail.com"}`)
+		var jsonStr = []byte(`{"email":"dwarkesh0007@gmail.com"}`)
 		token := ""
 		method := "POST"
 		mappedMethod := "SendOTP"
 
-		w := TestRouters(Ctrl, endPoints, token, method, mappedMethod, jsonStrs, false)
+		w := TestRouters(Ctrl, endPoints, token, method, mappedMethod, jsonStr, false)
 
 		Convey("Subject:Send OTP\n", t, func() {
 			Convey("Status Code Should Be 200", func() {
@@ -92,12 +86,12 @@ func TestVerifyOtp(t *testing.T) {
 	t.Run("VerifyOtp", func(t *testing.T) {
 		Ctrl := &controllers.UsersController{}
 		endPoints := "/v1/user/verifyotp"
-		var jsonStrs = []byte(`{"email":"dwarkesh0007@gmail.com","otp":"310376"}`)
+		var jsonStr = []byte(`{"email":"dwarkesh0007@gmail.com","otp":"310376"}`)
 		token := ""
 		method := "POST"
 		mappedMethod := "VerifyOTP"
 
-		w := TestRouters(Ctrl, endPoints, token, method, mappedMethod, jsonStrs, false)
+		w := TestRouters(Ctrl, endPoints, token, method, mappedMethod, jsonStr, false)
 
 		Convey("Subject:Verify OTP\n", t, func() {
 			Convey("Status Code Should Be 200", func() {
@@ -111,12 +105,12 @@ func TestLogin(t *testing.T) {
 	t.Run("Login", func(t *testing.T) {
 		Ctrl := &controllers.UsersController{}
 		endPoints := "/v1/user/login"
-		var jsonStrs = []byte(`{"email":"dwarkeshp@mail.com","password":"12345"}`)
+		var jsonStr = []byte(`{"email":"dwarkeshp@mail.com","password":"12345"}`)
 		token := ""
 		method := "POST"
 		mappedMethod := "Login"
 
-		w := TestRouters(Ctrl, endPoints, token, method, mappedMethod, jsonStrs, false)
+		w := TestRouters(Ctrl, endPoints, token, method, mappedMethod, jsonStr, false)
 
 		Convey("Subject:Create User Endpoint\n", t, func() {
 			Convey("Status Code Should Be 200", func() {
