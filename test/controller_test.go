@@ -3,9 +3,6 @@ package test
 import (
 	"bytes"
 	"car_demo/controllers"
-	"car_demo/middleware"
-	"fmt"
-	"log"
 
 	"net/http"
 	"net/http/httptest"
@@ -52,17 +49,13 @@ func TestGetAll(t *testing.T) {
 	t.Run("GetAll", func(t *testing.T) {
 		Ctrl := &controllers.UsersController{}
 		endPoint := "/v1/user/"
+		mappedMethod := "GetAll"
+		token := ""
+		method := "GET"
 
-		req, _ := http.NewRequest("GET", endPoint, nil)
+		w := TestRouters(Ctrl, endPoint, token, method, mappedMethod, nil, false)
 
-		w := httptest.NewRecorder()
-		router := beego.NewControllerRegister()
-
-		router.Add(endPoint, Ctrl, beego.WithRouterMethods(Ctrl, "get:GetAll"))
-
-		router.ServeHTTP(w, req)
-
-		Convey("Subject: Get All Endpoint\n", t, func() {
+		Convey("Subject: Get All Users\n", t, func() {
 			Convey("Status Code Should Be 200", func() {
 				So(w.Code, ShouldEqual, 200)
 			})
@@ -80,20 +73,14 @@ func TestSendOTP(t *testing.T) {
 	t.Run("SendOTP", func(t *testing.T) {
 		Ctrl := &controllers.UsersController{}
 		endPoints := "/v1/user/sendotp"
-
 		var jsonStrs = []byte(`{"email":"dwarkesh0007@gmail.com"}`)
+		token := ""
+		method := "POST"
+		mappedMethod := "SendOTP"
 
-		req, _ := http.NewRequest("POST", endPoints, bytes.NewBuffer(jsonStrs))
+		w := TestRouters(Ctrl, endPoints, token, method, mappedMethod, jsonStrs, false)
 
-		w := httptest.NewRecorder()
-
-		router := beego.NewControllerRegister()
-		router.Add(endPoints, Ctrl, beego.WithRouterMethods(Ctrl, "post:SendOTP"))
-		router.ServeHTTP(w, req)
-
-		// json.Unmarshal()
-		fmt.Printf("type of body %T", w.Body)
-		Convey("Subject:Create User Endpoint\n", t, func() {
+		Convey("Subject:Send OTP\n", t, func() {
 			Convey("Status Code Should Be 200", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
 			})
@@ -106,18 +93,13 @@ func TestVerifyOtp(t *testing.T) {
 		Ctrl := &controllers.UsersController{}
 		endPoints := "/v1/user/verifyotp"
 		var jsonStrs = []byte(`{"email":"dwarkesh0007@gmail.com","otp":"310376"}`)
+		token := ""
+		method := "POST"
+		mappedMethod := "VerifyOTP"
 
-		req, _ := http.NewRequest("POST", endPoints, bytes.NewBuffer(jsonStrs))
+		w := TestRouters(Ctrl, endPoints, token, method, mappedMethod, jsonStrs, false)
 
-		w := httptest.NewRecorder()
-
-		router := beego.NewControllerRegister()
-		router.Add(endPoints, Ctrl, beego.WithRouterMethods(Ctrl, "post:VerifyOTP"))
-		router.ServeHTTP(w, req)
-
-		// json.Unmarshal()
-		fmt.Printf("type of body %T", w.Body)
-		Convey("Subject:Create User Endpoint\n", t, func() {
+		Convey("Subject:Verify OTP\n", t, func() {
 			Convey("Status Code Should Be 200", func() {
 				So(w.Code, ShouldEqual, http.StatusOK)
 			})
@@ -127,18 +109,14 @@ func TestVerifyOtp(t *testing.T) {
 
 func TestLogin(t *testing.T) {
 	t.Run("Login", func(t *testing.T) {
-
 		Ctrl := &controllers.UsersController{}
 		endPoints := "/v1/user/login"
-		var jsonStrs = []byte(`{"email":"dwarkesh0007@gmail.com","password":"1234567"}`)
+		var jsonStrs = []byte(`{"email":"dwarkeshp@mail.com","password":"12345"}`)
+		token := ""
+		method := "POST"
+		mappedMethod := "Login"
 
-		req, _ := http.NewRequest("POST", endPoints, bytes.NewBuffer(jsonStrs))
-
-		w := httptest.NewRecorder()
-
-		router := beego.NewControllerRegister()
-		router.Add(endPoints, Ctrl, beego.WithRouterMethods(Ctrl, "post:Login"))
-		router.ServeHTTP(w, req)
+		w := TestRouters(Ctrl, endPoints, token, method, mappedMethod, jsonStrs, false)
 
 		Convey("Subject:Create User Endpoint\n", t, func() {
 			Convey("Status Code Should Be 200", func() {
@@ -149,31 +127,17 @@ func TestLogin(t *testing.T) {
 }
 
 func TestAddCar(t *testing.T) {
-
 	t.Run("AddCar", func(t *testing.T) {
-
 		Ctrl := &controllers.Car_masterController{}
-
 		endPoint := "/v1/cars/create"
-		jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE0MjYzOTQsInN1YiI6MjA4fQ.yvv6lZuMwMVCVlLCHCVJaZieeYpQlIYlF90BPp59rzQ"
-		token := fmt.Sprintf("Bearer %s", jwt)
-
-		var jsonStr = []byte(`{"car_name":"BMW X7", "make":"BMW", "model":"X7", "car_type":"sedan"}`)
-
-		creq, _ := http.NewRequest("POST", endPoint, bytes.NewBuffer(jsonStr))
-		creq.Header.Set("Authorization", token)
-
-		log.Print(creq.Header.Get("Authorization"))
-		cw := httptest.NewRecorder()
-
-		crouter := beego.NewControllerRegister()
-		crouter.InsertFilter(endPoint, beego.BeforeRouter, middleware.Auth, beego.WithCaseSensitive(true))
-		crouter.Add(endPoint, Ctrl, beego.WithRouterMethods(Ctrl, "post:Post"))
-		crouter.ServeHTTP(cw, creq)
-
+		jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE0MjgwMDMsInN1YiI6MjA4fQ.0qThD22k8IxZf4Fb65o-FHdgzwK5I55_Z8LaVDK-VCI"
+		var jsonStr = []byte(`{"car_name":"BMW X7", "make":"BMW", "model":"X7", "car_type":"SUV"}`)
+		method := "POST"
+		mappedMethod := "Post"
+		result := TestRouters(Ctrl, endPoint, jwt, method, mappedMethod, jsonStr, true)
 		Convey("Subject:Create User Endpoint\n", t, func() {
 			Convey("Status Code Should Be 200", func() {
-				So(cw.Code, ShouldEqual, http.StatusCreated)
+				So(result.Code, ShouldEqual, http.StatusCreated)
 			})
 		})
 	})

@@ -58,9 +58,12 @@ func (uc *UsersController) Post() {
 		return
 	}
 
-	if u, err := models.AddUsers(&v); err == nil {
-		helper.JsonResponse(uc.Controller, http.StatusCreated, 1, u, "")
+	if _, err := models.AddUsers(&v); err == nil {
+		// 	helper.JsonResponse(uc.Controller, http.StatusCreated, 1, u, "")
 		// helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
+
+		T, _ := models.LastInsertedUser()
+		helper.JsonResponse(uc.Controller, http.StatusCreated, 1, T, "")
 		return
 	} else {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())

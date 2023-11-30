@@ -1,11 +1,8 @@
 package helper
 
 import (
-	"bytes"
 	"car_demo/conf"
-	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"math/rand"
 
@@ -125,23 +122,4 @@ func SendMail(to string, subject, body string) bool {
 		return false
 	}
 	return true
-}
-
-func GetresponseDate(body *bytes.Buffer) (map[string]interface{}, error) {
-	var u Response
-	b, err := io.ReadAll(body)
-
-	if err != nil {
-		return nil, err
-	}
-	err = json.Unmarshal(b, &u)
-
-	if err != nil {
-		return nil, err
-	}
-
-	resp := map[int]interface{}{1: u.Data}
-
-	return resp[1].(map[string]interface{}), nil
-
 }

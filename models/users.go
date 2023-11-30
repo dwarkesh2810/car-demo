@@ -352,3 +352,14 @@ func UserPasswordReset(email, currentPassword, NewPassword string) (*Users, erro
 
 	return &data, nil
 }
+
+func LastInsertedUser() (*Users, error) {
+	o := orm.NewOrm()
+
+	var lastRecord Users
+	err := o.QueryTable(new(Users)).OrderBy("-id").Limit(1).One(&lastRecord)
+	if err != nil {
+		return nil, err
+	}
+	return &lastRecord, nil
+}
