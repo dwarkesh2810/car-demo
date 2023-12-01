@@ -146,7 +146,7 @@ func GetAllUsers(query map[string]string, fields []string, sortby []string, orde
 
 // UpdateUsers updates Users by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateUsersById(m *request.UserRequest) (err error) {
+func UpdateUsersById(m *request.UserUpdateRequest) (err error) {
 	o := orm.NewOrm()
 	v := Users{Id: m.Id}
 

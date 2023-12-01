@@ -6,6 +6,8 @@ import (
 
 	"github.com/beego/beego/v2/client/orm"
 	beego "github.com/beego/beego/v2/server/web"
+
+	// _ "github.com/beego/beego/v2/server/web/swagger"
 	_ "github.com/lib/pq"
 )
 
@@ -17,31 +19,27 @@ func init() {
 }
 
 func main() {
+
+	if beego.BConfig.RunMode == "dev" {
+		beego.BConfig.WebConfig.DirectoryIndex = true
+		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
+	}
+
 	beego.Run()
-	// var Data struct {
-	// 	Status  string      `json:"status"`
-	// 	Data    interface{} `json:"data"`
-	// 	Message string      `json:"message"`
-	// }
 
-	// // var PostData struct {
-	// // 	Name   string `json:"name"`
-	// // 	Salary string `json:"salary"`
-	// // 	Age    string `json:"age"`
-	// // }
-
-	// // JsonData, _ := json.Marshal(&PostData)
-
-	// req, _ := http.NewRequest("Get", "https://dummy.restapiexample.com/api/v1/employees", nil)
-
-	// // req1, _ := http.NewRequest("Post", "https://dummy.restapiexample.com/api/v1/create", bytes.NewBuffer(JsonData))
-
-	// client := &http.Client{}
-	// resp, _ := client.Do(req)
-
-	// body, _ := io.ReadAll(resp.Body)
-
-	// json.Unmarshal(body, &Data)
-
-	// log.Print(string(body))
 }
+
+// func RegisterRoutes(ns *beego.Namespace, controller *beego.Controller, basePath string) {
+// 	ctrlType := reflect.TypeOf(controller)
+
+// 	for i := 0; i < ctrlType.NumMethod(); i++ {
+// 		methodName := ctrlType.Method(i).Name
+
+// 		if strings.HasPrefix(methodName, "Mapping") {
+// 			handler, _ := ctrlType.MethodByName(methodName)
+// 			method := strings.TrimPrefix(methodName, "Mapping")
+
+// 			beego.AutoRouter(controller)
+// 		}
+// 	}
+// }

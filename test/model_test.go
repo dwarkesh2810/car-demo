@@ -151,8 +151,8 @@ func TestSendOTPMOdel(t *testing.T) {
 
 }
 
-func UserUpdateData(id int64) *request.UserRequest {
-	return &request.UserRequest{
+func UserUpdateData(id int64) *request.UserUpdateRequest {
+	return &request.UserUpdateRequest{
 		FirstName: "Dax",
 		LastName:  "dexter",
 		Email:     "dwarkesh@mail.com",

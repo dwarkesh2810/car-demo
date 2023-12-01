@@ -30,7 +30,6 @@ func (uc *UsersController) URLMapping() {
 	uc.Mapping("Put", uc.Put)
 	uc.Mapping("Delete", uc.Delete)
 	uc.Mapping("Login", uc.Login)
-	// uc.Mapping("VerifyUser", uc.VerifyUser)
 	uc.Mapping("SendOTP", uc.SendOTP)
 	uc.Mapping("VerifyOTP", uc.VerifyOTP)
 	uc.Mapping("ForgetPassword", uc.ForgetPassword)
@@ -42,7 +41,7 @@ func (uc *UsersController) URLMapping() {
 // @Param	body		body 	models.Users	true		"body for Users content"
 // @Success 201 {int} models.Users
 // @Failure 403 body is empty
-// @router / [post]
+// @router /v1/user/create [post]
 func (uc *UsersController) Post() {
 	var v request.CreateUserRequest
 	if err := uc.ParseForm(&v); err != nil {
@@ -76,7 +75,7 @@ func (uc *UsersController) Post() {
 // @Title Get One
 // @Description get Users by id
 // @Param	id		path 	string	true		"The key for staticblock"
-// @Success 200 {object} models.Users
+// @Success 200 {object} response.CreateUserResponse
 // @Failure 403 :id is empty
 // @router /:id [get]
 func (uc *UsersController) GetOne() {
@@ -103,6 +102,7 @@ func (uc *UsersController) GetOne() {
 // @Param	offset	query	string	false	"Start position of result set. Must be an integer"
 // @Success 200 {object} models.Users
 // @Failure 403
+// @Failure 400
 // @router / [get]
 func (uc *UsersController) GetAll() {
 	var fields []string
@@ -159,19 +159,20 @@ func (uc *UsersController) GetAll() {
 // @Title Put
 // @Description update the Users
 // @Param	id		path 	string	true		"The id you want to update"
-// @Param	body		body 	models.Users	true		"body for Users content"
-// @Success 200 {object} models.Users
+// @Param	body		body 	request.UserUpdateRequest	true		"body for Users content"
+// @Success 200 {object} string
 // @Failure 403 :id is not int
+// @Failure 400
 // @router /:id [put]
 func (uc *UsersController) Put() {
-	var v request.UserRequest
+	var v request.UserUpdateRequest
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
 		return
 	}
 
-	// json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
+	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 
 	log.Print(v)
 	if err := models.UpdateUsersById(&v); err == nil {
@@ -189,6 +190,7 @@ func (uc *UsersController) Put() {
 // @Param	id		path 	string	true		"The id you want to delete"
 // @Success 200 {string} delete success!
 // @Failure 403 id is empty
+// @Failure 400
 // @router /:id [delete]
 func (uc *UsersController) Delete() {
 	idStr := uc.Ctx.Input.Param(":id")
@@ -202,6 +204,14 @@ func (uc *UsersController) Delete() {
 	}
 }
 
+// Login ...
+// @Title Post
+// @Description Login User
+// @Param	body		body 	request.UserLoginRequest	true		"body for Users content"
+// @Success 200 {int} map[string]interface{}
+// @Failure 403 body is empty
+// @Failure 400
+// @router /login [post]
 func (uc *UsersController) Login() {
 	var err error
 	var us *models.Users
@@ -261,58 +271,16 @@ func (uc *UsersController) Login() {
 	helper.JsonResponse(uc.Controller, http.StatusOK, 1, map[string]interface{}{"data": &us, "token": accessToken}, "")
 }
 
-func (uc *UsersController) ResetPassword() {
-	var v struct {
-		Email           string `form:"email" json:"email"`
-		CurrentPassword string `form:"current_password" json:"current_password"`
-		NewPassword     string `form:"new_password" json:"new_password"`
-	}
-
-	if err := uc.ParseForm(&v); err != nil {
-		// Handle error if parsing fails
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
-		return
-	}
-
-	u, err := models.FindUserByEmail(v.Email)
-
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
-		return
-	}
-
-	ok, _ := helper.VerifyHashedData(v.CurrentPassword, u.Password)
-
-	if !ok {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "email and current Password didn't match")
-		return
-	}
-
-	up, err := helper.HashData(v.NewPassword)
-
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "faild to hashed password")
-		return
-	}
-	u.Password = up
-
-	// err = models.ResetPasswordUsingEmail(u)
-
-	// if err != nil {
-	// 	helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "unexpected database err"+err.Error())
-	// 	return
-	// }
-
-	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "OK", "")
-
-}
-
+// ForgetPassword ...
+// @Title Post
+// @Description Forgot Password
+// @Param	body		body 	request.ForgotPassword	true		"body for Users content"
+// @Success 200 {int} string
+// @Failure 403 body is empty
+// @Failure 400
+// @router /forgot_password [post]
 func (uc *UsersController) ForgetPassword() {
-	var v struct {
-		Email       string `form:"email" json:"email"`
-		Otp         string `form:"otp" json:"otp"`
-		NewPassword string `form:"new_password" json:"new_password"`
-	}
+	var v request.ForgotPassword
 
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
@@ -332,14 +300,18 @@ func (uc *UsersController) ForgetPassword() {
 
 }
 
+// SendOTP ...
+// @Title Post
+// @Description Forgot Password
+// @Param	body		body 	request.SendOTP	true		"body for Users content"
+// @Success 200 {int} string
+// @Failure 403 body is empty
+// @Failure 400
+// @router /sendotp [post]
 func (uc *UsersController) SendOTP() {
-	var v struct {
-		Email string `form:"email" json:"email"`
-	}
+	var v request.SendOTP
 
 	if err := uc.ParseForm(&v); err != nil {
-		// Handle error if parsing fails
-		log.Print("1111111111111111111111111111111111111111111111111")
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
 		return
 	}
@@ -364,10 +336,7 @@ func (uc *UsersController) SendOTP() {
 }
 
 func (uc *UsersController) VerifyOTP() {
-	var v struct {
-		Email string `form:"email" json:"email"`
-		Otp   string `form:"otp" json:"otp"`
-	}
+	var v request.VerifyOTP
 
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
