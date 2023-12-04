@@ -247,34 +247,38 @@ func VerifyUserAndUpdate(email string, otp string) (*Users, error) {
 	return &data, nil
 }
 
-func SendOtpToUser(email string, otp string) (*Users, error) {
+func SendOtpToUser(email string, otp string) (bool, error) {
 	o := orm.NewOrm()
 
-	tx, err := o.Begin()
+	_, err := o.Raw("CALL updateOtps(?, ?)", email, otp).Exec()
+	// tx, err := o.Begin()
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// var data Users
+	// if err = tx.QueryTable("users").Filter("email", email).One(&data); err != nil {
+	// 	// Rollback the transaction if there's an error
+	// 	tx.Rollback()
+	// 	return nil, err
+	// }
+
+	// data.Otp = otp
+	// data.UpdatedAt = time.Now().UnixMilli()
+
+	// if _, err := tx.Update(&data); err != nil {
+	// 	// Rollback the transaction if there's an error
+	// 	tx.Rollback()
+	// 	return nil, err
+	// }
+
+	// if err := tx.Commit(); err != nil {
+	// 	return nil, err
+	// }
 	if err != nil {
-		return nil, err
-	}
-	var data Users
-	if err = tx.QueryTable("users").Filter("email", email).One(&data); err != nil {
-		// Rollback the transaction if there's an error
-		tx.Rollback()
-		return nil, err
+		return false, err
 	}
 
-	data.Otp = otp
-	data.UpdatedAt = time.Now().UnixMilli()
-
-	if _, err := tx.Update(&data); err != nil {
-		// Rollback the transaction if there's an error
-		tx.Rollback()
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
-	return &data, nil
+	return true, nil
 }
 
 func UserPasswordUpdate(email string, password string, otp string) (*Users, error) {

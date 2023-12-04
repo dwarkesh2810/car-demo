@@ -5,3 +5,7 @@ conf/app.conf
 \*.env
 
 app.env
+
+test.sql
+
+car_demo

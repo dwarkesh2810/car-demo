@@ -350,12 +350,12 @@ func (uc *UsersController) SendOTP() {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "")
 		return
 	}
-	sent := helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
+	// sent := helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
 
-	if !sent {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "failed to send OTP")
-		return
-	}
+	// if !sent {
+	// 	helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "failed to send OTP")
+	// 	return
+	// }
 
 	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "Otp Sent Successfully", "")
 }
