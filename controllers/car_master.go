@@ -31,6 +31,7 @@ func (c *Car_masterController) URLMapping() {
 // @Title Post
 // @Description create Car_master
 // @Param	body		body 	models.Car_master	true		"body for Car_master content"
+// @Param   Authorization   header  string  true  "Bearer YourAccessToken"
 // @Success 201 {int} models.Car_master
 // @Failure 403 body is empty
 // @router / [post]

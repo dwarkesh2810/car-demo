@@ -7,7 +7,7 @@ import (
 	"car_demo/models"
 	"car_demo/request"
 	"encoding/json"
-	"log"
+
 	"net/http"
 	"strconv"
 	"strings"
@@ -41,7 +41,7 @@ func (uc *UsersController) URLMapping() {
 // @Param	body		body 	models.Users	true		"body for Users content"
 // @Success 201 {int} models.Users
 // @Failure 403 body is empty
-// @router /v1/user/create [post]
+// @router /register [post]
 func (uc *UsersController) Post() {
 	var v request.CreateUserRequest
 	if err := uc.ParseForm(&v); err != nil {
@@ -103,7 +103,7 @@ func (uc *UsersController) GetOne() {
 // @Success 200 {object} models.Users
 // @Failure 403
 // @Failure 400
-// @router / [get]
+// @router /getall [get]
 func (uc *UsersController) GetAll() {
 	var fields []string
 	var sortby []string
@@ -174,7 +174,6 @@ func (uc *UsersController) Put() {
 
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 
-	log.Print(v)
 	if err := models.UpdateUsersById(&v); err == nil {
 		helper.JsonResponse(uc.Controller, http.StatusOK, 1, "ok", "")
 		return
@@ -222,7 +221,7 @@ func (uc *UsersController) Login() {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
 		return
 	}
-	log.Print(uc.Ctx.Input.RequestBody)
+
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 	if v.Email == "" {
 		if v.Mobile == "" {
@@ -302,7 +301,7 @@ func (uc *UsersController) ForgetPassword() {
 
 // SendOTP ...
 // @Title Post
-// @Description Forgot Password
+// @Description Send Otp
 // @Param	body		body 	request.SendOTP	true		"body for Users content"
 // @Success 200 {int} string
 // @Failure 403 body is empty
@@ -335,6 +334,15 @@ func (uc *UsersController) SendOTP() {
 	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "Otp Sent Successfully", "")
 }
 
+// VerifyOTP ...
+// @Title Post
+// @Description Verify OTP
+// @Param	body		body 	request.VerifyOTP	true		"body for Users content"
+// @Success 200 {int} string
+// @Failure 403 body is empty
+// @Failure 400
+// @router /sendotp [post]
+
 func (uc *UsersController) VerifyOTP() {
 	var v request.VerifyOTP
 
@@ -344,11 +352,11 @@ func (uc *UsersController) VerifyOTP() {
 		return
 	}
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
-	data, err := models.VerifyUserAndUpdate(v.Email, v.Otp)
+	_, err := models.VerifyUserAndUpdate(v.Email, v.Otp)
 
 	if err != nil {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
 		return
 	}
-	helper.JsonResponse(uc.Controller, http.StatusOK, 1, data, "")
+	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "User Verification success", "")
 }

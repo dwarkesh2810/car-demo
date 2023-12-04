@@ -105,7 +105,7 @@ func TestLogin(t *testing.T) {
 	t.Run("Login", func(t *testing.T) {
 		Ctrl := &controllers.UsersController{}
 		endPoints := "/v1/user/login"
-		var jsonStr = []byte(`{"email":"dwarkeshp@mail.com","password":"12345"}`)
+		var jsonStr = []byte(`{"email":"dwarkesh00071@gmail.com","password":"1234567"}`)
 		token := ""
 		method := "POST"
 		mappedMethod := "Login"

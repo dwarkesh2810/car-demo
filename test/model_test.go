@@ -147,9 +147,6 @@ func TestUpdateUsersById(t *testing.T) {
 	})
 }
 
-func TestSendOTPMOdel(t *testing.T) {
-
-}
 
 func UserUpdateData(id int64) *request.UserUpdateRequest {
 	return &request.UserUpdateRequest{

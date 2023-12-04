@@ -23,7 +23,7 @@ func init() {
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/user",
 			beego.NSInclude(uc),
-			beego.NSRouter("/create", uc, "post:Post"),
+			beego.NSRouter("/register", uc, "post:Post"),
 			beego.NSRouter("/getall", uc, "get:GetAll"),
 			beego.NSRouter("/:id", uc, "get:GetOne;put:Put;delete:Delete"),
 			beego.NSRouter("/login", uc, "post:Login"),

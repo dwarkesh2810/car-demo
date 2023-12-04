@@ -6,7 +6,7 @@
         "version": "1.0.0",
         "termsOfService": "http://beego.me/",
         "contact": {
-            "email": "astaxie@gmail.com"
+            "email": "dwarkeshpatel.siliconithub@gmail.com"
         },
         "license": {
             "name": "Apache 2.0",
@@ -15,7 +15,38 @@
     },
     "basePath": "/v1",
     "paths": {
-        "/user/": {
+        "/user/forgot_password": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "description": "Forgot Password\n\u003cbr\u003e",
+                "operationId": "UsersController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Users content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.ForgotPassword"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{int} string"
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/user/getall": {
             "get": {
                 "tags": [
                     "user"
@@ -67,6 +98,9 @@
                             "$ref": "#/definitions/models.Users"
                         }
                     },
+                    "400": {
+                        "description": ""
+                    },
                     "403": {
                         "description": ""
                     }
@@ -92,11 +126,11 @@
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "{int} map[string]interface{}"
                     },
                     "400": {
-                        "description": "body is empty"
+                        "description": ""
                     },
                     "403": {
                         "description": "body is empty"
@@ -104,7 +138,7 @@
                 }
             }
         },
-        "/user/v1/user/create": {
+        "/user/register": {
             "post": {
                 "tags": [
                     "user"
@@ -132,6 +166,37 @@
                 }
             }
         },
+        "/user/sendotp": {
+            "post": {
+                "tags": [
+                    "user"
+                ],
+                "description": "Send Otp\n\u003cbr\u003e",
+                "operationId": "UsersController.Post",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Users content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.SendOTP"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{int} string"
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/user/{id}": {
             "get": {
                 "tags": [
@@ -152,7 +217,7 @@
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Users"
+                            "$ref": "#/definitions/response.CreateUserResponse"
                         }
                     },
                     "403": {
@@ -180,7 +245,7 @@
                         "description": "body for Users content",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Users"
+                            "$ref": "#/definitions/request.UserUpdateRequest"
                         }
                     }
                 ],
@@ -188,8 +253,11 @@
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Users"
+                            "type": "string"
                         }
+                    },
+                    "400": {
+                        "description": ""
                     },
                     "403": {
                         "description": ":id is not int"
@@ -214,6 +282,9 @@
                 "responses": {
                     "200": {
                         "description": "{string} delete success!"
+                    },
+                    "400": {
+                        "description": ""
                     },
                     "403": {
                         "description": "id is empty"
@@ -313,6 +384,30 @@
                 }
             }
         },
+        "request.ForgotPassword": {
+            "title": "ForgotPassword",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "new_password": {
+                    "type": "string"
+                },
+                "otp": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.SendOTP": {
+            "title": "SendOTP",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
         "request.UserLoginRequest": {
             "title": "UserLoginRequest",
             "type": "object",
@@ -325,6 +420,63 @@
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "request.UserUpdateRequest": {
+            "title": "UserUpdateRequest",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "mobile": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.CreateUserResponse": {
+            "title": "CreateUserResponse",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "mobile": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
         }
