@@ -23,26 +23,26 @@ type UsersController struct {
 }
 
 // URLMapping ...
-func (uc *UsersController) URLMapping() {
-	uc.Mapping("Post", uc.Post)
-	uc.Mapping("GetOne", uc.GetOne)
-	uc.Mapping("GetAll", uc.GetAll)
-	uc.Mapping("Put", uc.Put)
-	uc.Mapping("Delete", uc.Delete)
-	uc.Mapping("Login", uc.Login)
-	uc.Mapping("SendOTP", uc.SendOTP)
-	uc.Mapping("VerifyOTP", uc.VerifyOTP)
-	uc.Mapping("ForgetPassword", uc.ForgetPassword)
-}
+// func (uc *UsersController) URLMapping() {
+// 	uc.Mapping("Post", uc.Post)
+// 	uc.Mapping("GetOne", uc.GetOne)
+// 	uc.Mapping("GetAll", uc.GetAll)
+// 	uc.Mapping("Put", uc.Put)
+// 	uc.Mapping("Delete", uc.Delete)
+// 	uc.Mapping("Login", uc.Login)
+// 	uc.Mapping("SendOTP", uc.SendOTP)
+// 	uc.Mapping("VerifyOTP", uc.VerifyOTP)
+// 	uc.Mapping("ForgetPassword", uc.ForgetPassword)
+// }
 
-// Post ...
+// Register ...
 // @Title Post
 // @Description create Users
-// @Param	body		body 	models.Users	true		"body for Users content"
+// @Param	body		body 	request.CreateUserRequest	true		"body for Users content"
 // @Success 201 {int} models.Users
 // @Failure 403 body is empty
-// @router /register [post]
-func (uc *UsersController) Post() {
+// @router /users/register [post]
+func (uc *UsersController) Register() {
 	var v request.CreateUserRequest
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
@@ -71,22 +71,48 @@ func (uc *UsersController) Post() {
 	}
 }
 
+// // GetOne ...
+// // @Title Get One
+// // @Description get Users by id
+// // @Param	body		body 	request.GetUserByID	true		"body for Users content"
+// // @Success 200 {object} response.CreateUserResponse
+// // @Failure 403  is empty
+// // @router /users/getone [post]
+// func (uc *UsersController) GetOne() {
+// 	var v request.GetUserByID
+
+// 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
+
+// 	id, _ := strconv.ParseInt(v.Id, 0, 64)
+// 	u, err := models.GetUsersById(id)
+// 	if err != nil {
+// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
+// 		return
+// 	} else {
+// 		helper.JsonResponse(uc.Controller, http.StatusOK, 1, dto.DtOUserResponse(u), "")
+// 		return
+// 	}
+// }
+
 // GetOne ...
 // @Title Get One
 // @Description get Users by id
-// @Param	id		path 	string	true		"The key for staticblock"
-// @Success 200 {object} response.CreateUserResponse
+// @Param	id		path 	int	true		"The key for staticblock"
+// @Success 200 {object} models.Users
 // @Failure 403 :id is empty
-// @router /:id [get]
+// @router /users/getone/:id([0-9]+) [get]
 func (uc *UsersController) GetOne() {
-	idStr := uc.Ctx.Input.Param(":id")
-	id, _ := strconv.ParseInt(idStr, 0, 64)
+
+	i := uc.Ctx.Input.Params()
+
+	id, _ := strconv.ParseInt(i["0"], 0, 64)
+	// id := int64(220)
 	v, err := models.GetUsersById(id)
 	if err != nil {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
 		return
 	} else {
-		helper.JsonResponse(uc.Controller, http.StatusOK, 1, dto.DtOUserResponse(v), "")
+		helper.JsonResponse(uc.Controller, http.StatusOK, 1, v, "")
 		return
 	}
 }
@@ -103,7 +129,7 @@ func (uc *UsersController) GetOne() {
 // @Success 200 {object} models.Users
 // @Failure 403
 // @Failure 400
-// @router /getall [get]
+// @router /users/getall [get]
 func (uc *UsersController) GetAll() {
 	var fields []string
 	var sortby []string
@@ -163,7 +189,7 @@ func (uc *UsersController) GetAll() {
 // @Success 200 {object} string
 // @Failure 403 :id is not int
 // @Failure 400
-// @router /:id [put]
+// @router /users/:id [put]
 func (uc *UsersController) Put() {
 	var v request.UserUpdateRequest
 	if err := uc.ParseForm(&v); err != nil {
@@ -190,7 +216,7 @@ func (uc *UsersController) Put() {
 // @Success 200 {string} delete success!
 // @Failure 403 id is empty
 // @Failure 400
-// @router /:id [delete]
+// @router /users/:id [delete]
 func (uc *UsersController) Delete() {
 	idStr := uc.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
@@ -210,7 +236,7 @@ func (uc *UsersController) Delete() {
 // @Success 200 {int} map[string]interface{}
 // @Failure 403 body is empty
 // @Failure 400
-// @router /login [post]
+// @router /users/login [post]
 func (uc *UsersController) Login() {
 	var err error
 	var us *models.Users
@@ -277,7 +303,7 @@ func (uc *UsersController) Login() {
 // @Success 200 {int} string
 // @Failure 403 body is empty
 // @Failure 400
-// @router /forgot_password [post]
+// @router /users/forgot_password [post]
 func (uc *UsersController) ForgetPassword() {
 	var v request.ForgotPassword
 
@@ -300,20 +326,20 @@ func (uc *UsersController) ForgetPassword() {
 }
 
 // SendOTP ...
-// @Title Post
+// @Title SendOTP
 // @Description Send Otp
 // @Param	body		body 	request.SendOTP	true		"body for Users content"
 // @Success 200 {int} string
 // @Failure 403 body is empty
 // @Failure 400
-// @router /sendotp [post]
+// @router /users/sendotp [post]
 func (uc *UsersController) SendOTP() {
 	var v request.SendOTP
 
-	if err := uc.ParseForm(&v); err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
-		return
-	}
+	// if err := uc.ParseForm(&v); err != nil {
+	// 	helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
+	// 	return
+	// }
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 
 	userOTP := helper.GenerateOTP()
@@ -341,8 +367,7 @@ func (uc *UsersController) SendOTP() {
 // @Success 200 {int} string
 // @Failure 403 body is empty
 // @Failure 400
-// @router /sendotp [post]
-
+// @router /users/verifyotp [post]
 func (uc *UsersController) VerifyOTP() {
 	var v request.VerifyOTP
 

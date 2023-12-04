@@ -15,10 +15,218 @@
     },
     "basePath": "/v1",
     "paths": {
-        "/user/forgot_password": {
+        "/car_master/create": {
             "post": {
                 "tags": [
-                    "user"
+                    "car_demo/controllersCar_masterController"
+                ],
+                "description": "create Car_master\n\u003cbr\u003e",
+                "operationId": "Car_masterController.Post",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "car_name",
+                        "description": "body for Car_master content",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "car_type",
+                        "description": "body for Car_master content",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "make",
+                        "description": "body for Car_master content",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "model",
+                        "description": "body for Car_master content",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "ufile",
+                        "description": "File to upload",
+                        "required": true,
+                        "type": "file"
+                    },
+                    {
+                        "in": "header",
+                        "name": "Authorization",
+                        "description": "Bearer YourAccessToken",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "{int} models.Car_master"
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/car_master/getall": {
+            "get": {
+                "tags": [
+                    "car_demo/controllersCar_masterController"
+                ],
+                "description": "get Car_master\n\u003cbr\u003e",
+                "operationId": "Car_masterController.Get All",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "query",
+                        "description": "Filter. e.g. col1:v1,col2:v2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "fields",
+                        "description": "Fields returned. e.g. col1,col2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sortby",
+                        "description": "Sorted-by fields. e.g. col1,col2 ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "order",
+                        "description": "Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ...",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "limit",
+                        "description": "Limit the size of result set. Must be an integer",
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "offset",
+                        "description": "Start position of result set. Must be an integer",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Car_master"
+                        }
+                    },
+                    "403": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/car_master/{id}": {
+            "get": {
+                "tags": [
+                    "car_demo/controllersCar_masterController"
+                ],
+                "description": "get Car_master by id\n\u003cbr\u003e",
+                "operationId": "Car_masterController.Get One",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The key for staticblock",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Car_master"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is empty"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "car_demo/controllersCar_masterController"
+                ],
+                "description": "update the Car_master\n\u003cbr\u003e",
+                "operationId": "Car_masterController.Put",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The id you want to update",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Car_master content",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Car_master"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Car_master"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is not int"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "car_demo/controllersCar_masterController"
+                ],
+                "description": "delete the Car_master\n\u003cbr\u003e",
+                "operationId": "Car_masterController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The id you want to delete",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} delete success!"
+                    },
+                    "403": {
+                        "description": "id is empty"
+                    }
+                }
+            }
+        },
+        "/users/forgot_password": {
+            "post": {
+                "tags": [
+                    "car_demo/controllersUsersController"
                 ],
                 "description": "Forgot Password\n\u003cbr\u003e",
                 "operationId": "UsersController.Post",
@@ -46,10 +254,10 @@
                 }
             }
         },
-        "/user/getall": {
+        "/users/getall": {
             "get": {
                 "tags": [
-                    "user"
+                    "car_demo/controllersUsersController"
                 ],
                 "description": "get Users\n\u003cbr\u003e",
                 "operationId": "UsersController.Get All",
@@ -107,10 +315,40 @@
                 }
             }
         },
-        "/user/login": {
+        "/users/getone/{id}": {
+            "get": {
+                "tags": [
+                    "car_demo/controllersUsersController"
+                ],
+                "description": "get Users by id\n\u003cbr\u003e",
+                "operationId": "UsersController.Get One",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The key for staticblock",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Users"
+                        }
+                    },
+                    "403": {
+                        "description": ":id is empty"
+                    }
+                }
+            }
+        },
+        "/users/login": {
             "post": {
                 "tags": [
-                    "user"
+                    "car_demo/controllersUsersController"
                 ],
                 "description": "Login User\n\u003cbr\u003e",
                 "operationId": "UsersController.Post",
@@ -138,10 +376,10 @@
                 }
             }
         },
-        "/user/register": {
+        "/users/register": {
             "post": {
                 "tags": [
-                    "user"
+                    "car_demo/controllersUsersController"
                 ],
                 "description": "create Users\n\u003cbr\u003e",
                 "operationId": "UsersController.Post",
@@ -152,7 +390,7 @@
                         "description": "body for Users content",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Users"
+                            "$ref": "#/definitions/request.CreateUserRequest"
                         }
                     }
                 ],
@@ -166,13 +404,13 @@
                 }
             }
         },
-        "/user/sendotp": {
+        "/users/sendotp": {
             "post": {
                 "tags": [
-                    "user"
+                    "car_demo/controllersUsersController"
                 ],
                 "description": "Send Otp\n\u003cbr\u003e",
-                "operationId": "UsersController.Post",
+                "operationId": "UsersController.SendOTP",
                 "parameters": [
                     {
                         "in": "body",
@@ -197,37 +435,41 @@
                 }
             }
         },
-        "/user/{id}": {
-            "get": {
+        "/users/verifyotp": {
+            "post": {
                 "tags": [
-                    "user"
+                    "car_demo/controllersUsersController"
                 ],
-                "description": "get Users by id\n\u003cbr\u003e",
-                "operationId": "UsersController.Get One",
+                "description": "Verify OTP\n\u003cbr\u003e",
+                "operationId": "UsersController.Post",
                 "parameters": [
                     {
-                        "in": "path",
-                        "name": "id",
-                        "description": "The key for staticblock",
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Users content",
                         "required": true,
-                        "type": "string"
+                        "schema": {
+                            "$ref": "#/definitions/request.VerifyOTP"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/response.CreateUserResponse"
-                        }
+                        "description": "{int} string"
+                    },
+                    "400": {
+                        "description": ""
                     },
                     "403": {
-                        "description": ":id is empty"
+                        "description": "body is empty"
                     }
                 }
-            },
+            }
+        },
+        "/users/{id}": {
             "put": {
                 "tags": [
-                    "user"
+                    "car_demo/controllersUsersController"
                 ],
                 "description": "update the Users\n\u003cbr\u003e",
                 "operationId": "UsersController.Put",
@@ -266,7 +508,7 @@
             },
             "delete": {
                 "tags": [
-                    "user"
+                    "car_demo/controllersUsersController"
                 ],
                 "description": "delete the Users\n\u003cbr\u003e",
                 "operationId": "UsersController.Delete",
@@ -294,6 +536,14 @@
         }
     },
     "definitions": {
+        "OTPData": {
+            "title": "OTPData",
+            "type": "object"
+        },
+        "VerifyData": {
+            "title": "VerifyData",
+            "type": "object"
+        },
         "models.CarType": {
             "title": "CarType",
             "type": "string",
@@ -384,6 +634,30 @@
                 }
             }
         },
+        "request.CreateUserRequest": {
+            "title": "CreateUserRequest",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "mobile": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
         "request.ForgotPassword": {
             "title": "ForgotPassword",
             "type": "object",
@@ -451,40 +725,27 @@
                 }
             }
         },
-        "response.CreateUserResponse": {
-            "title": "CreateUserResponse",
+        "request.VerifyOTP": {
+            "title": "VerifyOTP",
             "type": "object",
             "properties": {
                 "email": {
                     "type": "string"
                 },
-                "first_name": {
+                "otp": {
                     "type": "string"
-                },
-                "id": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "mobile": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer",
-                    "format": "int64"
                 }
             }
         }
     },
     "tags": [
         {
-            "name": "user",
+            "name": "car_demo/controllersUsersController",
             "description": "UsersController operations for Users\n"
+        },
+        {
+            "name": "car_demo/controllersCar_masterController",
+            "description": "Car_masterController operations for Car_master\n"
         }
     ]
 }

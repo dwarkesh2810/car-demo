@@ -147,7 +147,6 @@ func TestUpdateUsersById(t *testing.T) {
 	})
 }
 
-
 func UserUpdateData(id int64) *request.UserUpdateRequest {
 	return &request.UserUpdateRequest{
 		FirstName: "Dax",

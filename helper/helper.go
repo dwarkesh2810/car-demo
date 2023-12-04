@@ -93,7 +93,7 @@ func GetFileAndStore(uc beego.Controller, file string, pathName string, path str
 		}
 	}
 
-	err = uc.SaveToFile("imageFile", pathForDatabase+hd.Filename)
+	err = uc.SaveToFile(file, pathForDatabase+hd.Filename)
 
 	if err != nil {
 		return "", err
@@ -123,3 +123,4 @@ func SendMail(to string, subject, body string) bool {
 	}
 	return true
 }
+

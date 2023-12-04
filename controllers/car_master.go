@@ -4,7 +4,9 @@ import (
 	"car_demo/dto"
 	"car_demo/helper"
 	"car_demo/models"
+	"car_demo/request"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,15 +32,20 @@ func (c *Car_masterController) URLMapping() {
 // Post ...
 // @Title Post
 // @Description create Car_master
-// @Param	body		body 	models.Car_master	true		"body for Car_master content"
+// @Param	car_name		formData 	string	true		"body for Car_master content"
+// @Param	car_type		formData 	string	true		"body for Car_master content"
+// @Param	make		formData 	string	true		"body for Car_master content"
+// @Param	model		formData 	string	true		"body for Car_master content"
+// @Param ufile formData file true "File to upload"
 // @Param   Authorization   header  string  true  "Bearer YourAccessToken"
 // @Success 201 {int} models.Car_master
 // @Failure 403 body is empty
-// @router / [post]
-func (c *Car_masterController) Post() {
+// @router /car_master/create [post]
+func (c *Car_masterController) Create() {
+
 	ctx := c.Ctx.Input.GetData("user")
 	uid := ctx.(*models.Users).Id
-	var v models.Car_master
+	var v request.CreateCarDataRequest
 
 	if err := c.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
@@ -46,24 +53,29 @@ func (c *Car_masterController) Post() {
 		return
 	}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
-	// imgPath, err := helper.GetFileAndStore(c.Controller, "imageFile", "cars", string(v.CarType))
+	imgPath, err := helper.GetFileAndStore(c.Controller, "ufile", "cars", string(v.CarType))
 
-	// if err != nil {
-	// 	helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
-	// 	return
-	// }
+	if err != nil {
+		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		return
+	}
 
-	imgPath := "assets/img/cars/sedan/HuracanModelImage.jpg"
+	log.Print("----------------------------------------------------------------------------", v)
+	// imgPath := "assets/img/cars/sedan/HuracanModelImage.jpg"
+	var u models.Car_master = models.Car_master{
+		CarName:   v.CarName,
+		CarImage:  imgPath,
+		CarType:   models.CarType(v.CarType),
+		Model:     v.Model,
+		Make:      v.Make,
+		CreatedAt: int(time.Now().Unix()),
+		UserId:    uid,
+	}
 
-	v.CarImage = imgPath
-	v.CreatedAt = int(time.Now().Unix())
-	v.UpdatedAt = int(time.Now().Unix())
-	v.UserId = uid
-
-	switch v.CarType {
+	switch u.CarType {
 	case models.Hatchback, models.SUV, models.Sedan:
-		if _, err := models.AddCar_master(&v); err == nil {
-			helper.JsonResponse(c.Controller, http.StatusCreated, 1, dto.DtOAddCarResponse(&v), "")
+		if _, err := models.AddCar_master(&u); err == nil {
+			helper.JsonResponse(c.Controller, http.StatusCreated, 1, dto.DtOAddCarResponse(&u), "")
 			return
 		} else {
 			helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
@@ -82,7 +94,7 @@ func (c *Car_masterController) Post() {
 // @Param	id		path 	string	true		"The key for staticblock"
 // @Success 200 {object} models.Car_master
 // @Failure 403 :id is empty
-// @router /:id [get]
+// @router /car_master/:id [get]
 func (c *Car_masterController) GetOne() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
@@ -107,7 +119,7 @@ func (c *Car_masterController) GetOne() {
 // @Param	offset	query	string	false	"Start position of result set. Must be an integer"
 // @Success 200 {object} models.Car_master
 // @Failure 403
-// @router / [get]
+// @router /car_master/getall [get]
 func (c *Car_masterController) GetAll() {
 	var fields []string
 	var sortby []string
@@ -166,7 +178,7 @@ func (c *Car_masterController) GetAll() {
 // @Param	body		body 	models.Car_master	true		"body for Car_master content"
 // @Success 200 {object} models.Car_master
 // @Failure 403 :id is not int
-// @router /:id [put]
+// @router /car_master/:id [put]
 func (c *Car_masterController) Put() {
 
 	idStr := c.Ctx.Input.Param(":id")
@@ -195,7 +207,7 @@ func (c *Car_masterController) Put() {
 // @Param	id		path 	string	true		"The id you want to delete"
 // @Success 200 {string} delete success!
 // @Failure 403 id is empty
-// @router /:id [delete]
+// @router /car_master/:id [delete]
 func (c *Car_masterController) Delete() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)

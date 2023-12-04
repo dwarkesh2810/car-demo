@@ -3,6 +3,7 @@ package controllers
 import (
 	"car_demo/conf"
 	"car_demo/helper"
+	"car_demo/models"
 	"encoding/json"
 	"net/http"
 
@@ -13,15 +14,6 @@ import (
 
 type MsgController struct {
 	beego.Controller
-}
-
-type OTPData struct {
-	PhoneNumber string `json:"phone_number"`
-}
-
-type VerifyData struct {
-	User string `json:"user,omitempty"`
-	Code string `json:"code,omitempty"`
 }
 
 func (c *MsgController) URLMapping() {
@@ -69,8 +61,16 @@ func TwilioVerifyOTP(phoneNumber string, code string) error {
 	return nil
 }
 
+// SendSMS ...
+// @Title SendSMS
+// @Description SendSMS
+// @Param	body		body 	OTPData	true		"body for Message content"
+// @Success 200 {int} string
+// @Failure 403 body is empty
+// @Failure 400 body is empty
+// @router /otp [post]
 func (app *MsgController) SendSMS() {
-	var v OTPData
+	var v models.OTP
 	err := json.Unmarshal(app.Ctx.Input.RequestBody, &v)
 
 	if err != nil {
@@ -86,8 +86,16 @@ func (app *MsgController) SendSMS() {
 	helper.JsonResponse(app.Controller, http.StatusOK, 1, "OTP send succesfull", "")
 }
 
+// VerifySMS ...
+// @Title VerifySMS
+// @Description VerifySMS
+// @Param	body		body 	VerifyData	true		"body for Message content"
+// @Success 200 {int} string
+// @Failure 403 body is empty
+// @Failure 400 body is empty
+// @router /verify [post]
 func (app *MsgController) VerifySMS() {
-	var v VerifyData
+	var v models.VerifyData
 
 	err := json.Unmarshal(app.Ctx.Input.RequestBody, &v)
 
@@ -95,7 +103,7 @@ func (app *MsgController) VerifySMS() {
 		return
 	}
 
-	newData := VerifyData{
+	newData := models.VerifyData{
 		User: v.User,
 		Code: v.Code,
 	}

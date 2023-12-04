@@ -18,12 +18,12 @@ func TestCreateUser(t *testing.T) {
 
 	t.Run("CreateUser", func(t *testing.T) {
 		Ctrl := &controllers.UsersController{}
-		endPoint := "/v1/user/create"
-		var jsonStr = []byte(`{"first_name":"Dwarkesh", "last_name":"Patel", "email":"dwarkesh00071@gmail.com", "mobile":"12343241343543", "password":"1234567", "role":"user"}`)
+		endPoint := "/v1/users/register"
+		var jsonStr = []byte(`{"first_name":"Dwarkesh", "last_name":"Patel", "email":"dwarkesh0007@gmail.com", "mobile":"12343241343543", "password":"1234567", "role":"user"}`)
 
 		token := ""
 		method := "POST"
-		mappedMethod := "Post"
+		mappedMethod := "Register"
 
 		w := TestRouters(Ctrl, endPoint, token, method, mappedMethod, jsonStr, false)
 

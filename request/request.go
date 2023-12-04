@@ -39,3 +39,14 @@ type VerifyOTP struct {
 	Email string `form:"email" json:"email"`
 	Otp   string `form:"otp" json:"otp"`
 }
+
+type GetUserByID struct {
+	Id string `json:"id"`
+}
+
+type CreateCarDataRequest struct {
+	CarName string `json:"car_name" form:"car_name"`
+	CarType string `json:"car_type" form:"car_type"`
+	Make    string `json:"make" form:"make"`
+	Model   string `json:"model" form:"model"`
+}

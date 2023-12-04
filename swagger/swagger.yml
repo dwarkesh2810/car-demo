@@ -12,14 +12,14 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /v1
 paths:
-  /user/{id}:
+  /car_master/{id}:
     get:
       tags:
-      - user
+      - car_demo/controllersCar_masterController
       description: |-
-        get Users by id
+        get Car_master by id
         <br>
-      operationId: UsersController.Get One
+      operationId: Car_masterController.Get One
       parameters:
       - in: path
         name: id
@@ -30,12 +30,142 @@ paths:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/response.CreateUserResponse'
+            $ref: '#/definitions/models.Car_master'
         "403":
           description: :id is empty
     put:
       tags:
-      - user
+      - car_demo/controllersCar_masterController
+      description: |-
+        update the Car_master
+        <br>
+      operationId: Car_masterController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Car_master content
+        required: true
+        schema:
+          $ref: '#/definitions/models.Car_master'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Car_master'
+        "403":
+          description: :id is not int
+    delete:
+      tags:
+      - car_demo/controllersCar_masterController
+      description: |-
+        delete the Car_master
+        <br>
+      operationId: Car_masterController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
+  /car_master/create:
+    post:
+      tags:
+      - car_demo/controllersCar_masterController
+      description: |-
+        create Car_master
+        <br>
+      operationId: Car_masterController.Post
+      parameters:
+      - in: formData
+        name: car_name
+        description: body for Car_master content
+        required: true
+        type: string
+      - in: formData
+        name: car_type
+        description: body for Car_master content
+        required: true
+        type: string
+      - in: formData
+        name: make
+        description: body for Car_master content
+        required: true
+        type: string
+      - in: formData
+        name: model
+        description: body for Car_master content
+        required: true
+        type: string
+      - in: formData
+        name: ufile
+        description: File to upload
+        required: true
+        type: file
+      - in: header
+        name: Authorization
+        description: Bearer YourAccessToken
+        required: true
+        type: string
+      responses:
+        "201":
+          description: '{int} models.Car_master'
+        "403":
+          description: body is empty
+  /car_master/getall:
+    get:
+      tags:
+      - car_demo/controllersCar_masterController
+      description: |-
+        get Car_master
+        <br>
+      operationId: Car_masterController.Get All
+      parameters:
+      - in: query
+        name: query
+        description: Filter. e.g. col1:v1,col2:v2 ...
+        type: string
+      - in: query
+        name: fields
+        description: Fields returned. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: sortby
+        description: Sorted-by fields. e.g. col1,col2 ...
+        type: string
+      - in: query
+        name: order
+        description: Order corresponding to each sortby field, if single value, apply
+          to all sortby fields. e.g. desc,asc ...
+        type: string
+      - in: query
+        name: limit
+        description: Limit the size of result set. Must be an integer
+        type: string
+      - in: query
+        name: offset
+        description: Start position of result set. Must be an integer
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Car_master'
+        "403":
+          description: ""
+  /users/{id}:
+    put:
+      tags:
+      - car_demo/controllersUsersController
       description: |-
         update the Users
         <br>
@@ -63,7 +193,7 @@ paths:
           description: :id is not int
     delete:
       tags:
-      - user
+      - car_demo/controllersUsersController
       description: |-
         delete the Users
         <br>
@@ -81,10 +211,10 @@ paths:
           description: ""
         "403":
           description: id is empty
-  /user/forgot_password:
+  /users/forgot_password:
     post:
       tags:
-      - user
+      - car_demo/controllersUsersController
       description: |-
         Forgot Password
         <br>
@@ -103,10 +233,10 @@ paths:
           description: ""
         "403":
           description: body is empty
-  /user/getall:
+  /users/getall:
     get:
       tags:
-      - user
+      - car_demo/controllersUsersController
       description: |-
         get Users
         <br>
@@ -146,10 +276,32 @@ paths:
           description: ""
         "403":
           description: ""
-  /user/login:
+  /users/getone/{id}:
+    get:
+      tags:
+      - car_demo/controllersUsersController
+      description: |-
+        get Users by id
+        <br>
+      operationId: UsersController.Get One
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: integer
+        format: int64
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Users'
+        "403":
+          description: :id is empty
+  /users/login:
     post:
       tags:
-      - user
+      - car_demo/controllersUsersController
       description: |-
         Login User
         <br>
@@ -168,10 +320,10 @@ paths:
           description: ""
         "403":
           description: body is empty
-  /user/register:
+  /users/register:
     post:
       tags:
-      - user
+      - car_demo/controllersUsersController
       description: |-
         create Users
         <br>
@@ -182,20 +334,20 @@ paths:
         description: body for Users content
         required: true
         schema:
-          $ref: '#/definitions/models.Users'
+          $ref: '#/definitions/request.CreateUserRequest'
       responses:
         "201":
           description: '{int} models.Users'
         "403":
           description: body is empty
-  /user/sendotp:
+  /users/sendotp:
     post:
       tags:
-      - user
+      - car_demo/controllersUsersController
       description: |-
         Send Otp
         <br>
-      operationId: UsersController.Post
+      operationId: UsersController.SendOTP
       parameters:
       - in: body
         name: body
@@ -210,7 +362,35 @@ paths:
           description: ""
         "403":
           description: body is empty
+  /users/verifyotp:
+    post:
+      tags:
+      - car_demo/controllersUsersController
+      description: |-
+        Verify OTP
+        <br>
+      operationId: UsersController.Post
+      parameters:
+      - in: body
+        name: body
+        description: body for Users content
+        required: true
+        schema:
+          $ref: '#/definitions/request.VerifyOTP'
+      responses:
+        "200":
+          description: '{int} string'
+        "400":
+          description: ""
+        "403":
+          description: body is empty
 definitions:
+  OTPData:
+    title: OTPData
+    type: object
+  VerifyData:
+    title: VerifyData
+    type: object
   models.Car_master:
     title: Car_master
     type: object
@@ -275,6 +455,22 @@ definitions:
       status:
         type: integer
         format: int64
+  request.CreateUserRequest:
+    title: CreateUserRequest
+    type: object
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      mobile:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
   request.ForgotPassword:
     title: ForgotPassword
     type: object
@@ -320,27 +516,18 @@ definitions:
         type: string
       role:
         type: string
-  response.CreateUserResponse:
-    title: CreateUserResponse
+  request.VerifyOTP:
+    title: VerifyOTP
     type: object
     properties:
       email:
         type: string
-      first_name:
+      otp:
         type: string
-      id:
-        type: integer
-        format: int64
-      last_name:
-        type: string
-      mobile:
-        type: string
-      role:
-        type: string
-      status:
-        type: integer
-        format: int64
 tags:
-- name: user
+- name: car_demo/controllersUsersController
   description: |
     UsersController operations for Users
+- name: car_demo/controllersCar_masterController
+  description: |
+    Car_masterController operations for Car_master
