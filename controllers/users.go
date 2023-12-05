@@ -4,9 +4,13 @@ import (
 	"car_demo/conf"
 	"car_demo/dto"
 	"car_demo/helper"
+	"car_demo/logger"
 	"car_demo/models"
 	"car_demo/request"
+	"car_demo/sessions"
+
 	"encoding/json"
+	"log"
 
 	"net/http"
 	"strconv"
@@ -43,6 +47,7 @@ type UsersController struct {
 // @Failure 403 body is empty
 // @router /users/register [post]
 func (uc *UsersController) Register() {
+	logger.Init()
 	var v request.CreateUserRequest
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
@@ -53,11 +58,15 @@ func (uc *UsersController) Register() {
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 
 	isExist := models.IsExistingUser(v.Email, v.Mobile)
+
 	if isExist {
+		logger.Warning("user already exists", v.Email)
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "User already exist")
 		return
 	}
-
+	sessions.SetSessionName("test12123")
+	logger.Info("data", "succes")
+	logger.Debug("test")
 	if _, err := models.AddUsers(&v); err == nil {
 		// 	helper.JsonResponse(uc.Controller, http.StatusCreated, 1, u, "")
 		// helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
@@ -280,7 +289,12 @@ func (uc *UsersController) Login() {
 			return
 		}
 	}
+	err = sessions.Set(uc.Controller, "user", us.Email)
 
+	if err != nil {
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while set session")
+		return
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": us.Id,
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
@@ -384,4 +398,29 @@ func (uc *UsersController) VerifyOTP() {
 		return
 	}
 	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "User Verification success", "")
+}
+
+func (c *UsersController) DemoSet() {
+	err := c.SetSession("test", "hello")
+	if err != nil {
+		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		log.Print(err)
+		return
+	}
+	err = c.SetSession("test2", "how ar you")
+
+	c.StartSession()
+
+	if err != nil {
+		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		log.Print(err)
+	}
+
+	helper.JsonResponse(c.Controller, http.StatusOK, 1, "set data", "")
+}
+
+func (c *UsersController) DemoGet() {
+	a := c.GetSession("test")
+	b := c.GetSession("test2")
+	helper.JsonResponse(c.Controller, 200, 1, map[string]interface{}{"a": a, "b": b}, "")
 }

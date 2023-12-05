@@ -25,7 +25,7 @@ func init() {
 		// beego.NSAutoRouter(mc),
 		beego.NSInclude(uc),
 		// beego.NSNamespace("/sms",
-			// beego.NSRouter("/otp", mc, "post:SendSMS"),
+		// beego.NSRouter("/otp", mc, "post:SendSMS"),
 		// 	beego.NSRouter("/verify", mc, "post:VerifySMS"),
 		// ),
 		// beego.NSNamespace("/car",
@@ -45,19 +45,12 @@ func init() {
 		// beego.NSBefore(middleware.Auth),
 	)
 
+	beego.Router("/demoset", uc, "get:DemoSet")
+	beego.Router("/demoget", uc, "get:DemoGet")
+
 	beego.InsertFilter("/v1/car_master/create", beego.BeforeRouter, middleware.Auth)
 	// beego.Router("v1/users/getone/?:id", uc, "get:GetOne")
 
 	beego.AddNamespace(ns)
 	beego.AddNamespace(n1)
 }
-
-// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NTYzMTUsInN1YiI6MjIwfQ.Ulw6ZLo9mNX6tlrq4yNJ118CsuoUoY1eDZhJPPHb_qo
-
-// {
-// 	"car_image": "assets/img/cars/sedan/HuracanModelImage.jpg",
-// 	"car_name": "BMW",
-// 	"car_type": "sedan",
-// 	"make": "BMW",
-// 	"model": "X7"
-//   }

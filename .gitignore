@@ -9,3 +9,5 @@ app.env
 test.sql
 
 car_demo
+logs/
+logs
