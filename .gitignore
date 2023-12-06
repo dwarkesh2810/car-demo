@@ -6,7 +6,7 @@ conf/app.conf
 
 app.env
 
-test.sql
+# test.sql
 
 car_demo
 logs/
