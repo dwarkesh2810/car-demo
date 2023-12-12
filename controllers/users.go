@@ -7,7 +7,6 @@ import (
 	"car_demo/logger"
 	"car_demo/models"
 	"car_demo/request"
-	"car_demo/sessions"
 
 	"encoding/json"
 	"log"
@@ -18,26 +17,15 @@ import (
 	"time"
 
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/beego/i18n"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 // UsersController operations for Users
 type UsersController struct {
 	beego.Controller
+	i18n.Locale
 }
-
-// URLMapping ...
-// func (uc *UsersController) URLMapping() {
-// 	uc.Mapping("Post", uc.Post)
-// 	uc.Mapping("GetOne", uc.GetOne)
-// 	uc.Mapping("GetAll", uc.GetAll)
-// 	uc.Mapping("Put", uc.Put)
-// 	uc.Mapping("Delete", uc.Delete)
-// 	uc.Mapping("Login", uc.Login)
-// 	uc.Mapping("SendOTP", uc.SendOTP)
-// 	uc.Mapping("VerifyOTP", uc.VerifyOTP)
-// 	uc.Mapping("ForgetPassword", uc.ForgetPassword)
-// }
 
 // Register ...
 // @Title Post
@@ -51,7 +39,7 @@ func (uc *UsersController) Register() {
 	var v request.CreateUserRequest
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.parsing"))
 		return
 	}
 
@@ -60,48 +48,23 @@ func (uc *UsersController) Register() {
 	isExist := models.IsExistingUser(v.Email, v.Mobile)
 
 	if isExist {
-		logger.Warning("user already exists", v.Email)
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "User already exist")
+		logger.Warning(helper.LanguageTranslate(uc.Controller, "error.userexist"), v.Email)
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.userexist"))
 		return
 	}
-	sessions.SetSessionName("test12123")
-	logger.Info("data", "succes")
-	logger.Debug("test")
+
 	if _, err := models.AddUsers(&v); err == nil {
 		// 	helper.JsonResponse(uc.Controller, http.StatusCreated, 1, u, "")
 		// helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
 
 		T, _ := models.LastInsertedUser()
-		helper.JsonResponse(uc.Controller, http.StatusCreated, 1, dto.DtOUserResponse(T), "")
+		helper.JsonResponse(uc.Controller, http.StatusCreated, 1, helper.MappedData("user is created", dto.DtOUserResponse(T)), "")
 		return
 	} else {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.db"))
 		return
 	}
 }
-
-// // GetOne ...
-// // @Title Get One
-// // @Description get Users by id
-// // @Param	body		body 	request.GetUserByID	true		"body for Users content"
-// // @Success 200 {object} response.CreateUserResponse
-// // @Failure 403  is empty
-// // @router /users/getone [post]
-// func (uc *UsersController) GetOne() {
-// 	var v request.GetUserByID
-
-// 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
-
-// 	id, _ := strconv.ParseInt(v.Id, 0, 64)
-// 	u, err := models.GetUsersById(id)
-// 	if err != nil {
-// 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
-// 		return
-// 	} else {
-// 		helper.JsonResponse(uc.Controller, http.StatusOK, 1, dto.DtOUserResponse(u), "")
-// 		return
-// 	}
-// }
 
 // GetOne ...
 // @Title Get One
@@ -118,10 +81,10 @@ func (uc *UsersController) GetOne() {
 	// id := int64(220)
 	v, err := models.GetUsersById(id)
 	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.db"))
 		return
 	} else {
-		helper.JsonResponse(uc.Controller, http.StatusOK, 1, v, "")
+		helper.JsonResponse(uc.Controller, http.StatusOK, 1, helper.MappedData("user's data", v), "")
 		return
 	}
 }
@@ -172,7 +135,7 @@ func (uc *UsersController) GetAll() {
 		for _, cond := range strings.Split(v, ",") {
 			kv := strings.SplitN(cond, ":", 2)
 			if len(kv) != 2 {
-				helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error: invalid query key/value pair")
+				helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.query"))
 				return
 			}
 			k, v := kv[0], kv[1]
@@ -182,10 +145,10 @@ func (uc *UsersController) GetAll() {
 
 	l, err := models.GetAllUsers(query, fields, sortby, order, offset, limit)
 	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.db"))
 		return
 	} else {
-		helper.JsonResponse(uc.Controller, http.StatusOK, 1, l, "")
+		helper.JsonResponse(uc.Controller, http.StatusOK, 1, helper.MappedData("all users data", l), "")
 		return
 	}
 }
@@ -198,42 +161,44 @@ func (uc *UsersController) GetAll() {
 // @Success 200 {object} string
 // @Failure 403 :id is not int
 // @Failure 400
-// @router /users/:id [put]
-func (uc *UsersController) Put() {
+// @router /users/update [put]
+func (uc *UsersController) Update() {
+
 	var v request.UserUpdateRequest
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.parsing"))
 		return
 	}
 
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 
 	if err := models.UpdateUsersById(&v); err == nil {
-		helper.JsonResponse(uc.Controller, http.StatusOK, 1, "ok", "")
+		helper.JsonResponse(uc.Controller, http.StatusOK, 1, helper.MappedData("user's data is updated", nil), "")
 		return
 	} else {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.db"))
 		return
 	}
 }
 
-// Delete ...
+// Deletes ...
 // @Title Delete
 // @Description delete the Users
 // @Param	id		path 	string	true		"The id you want to delete"
 // @Success 200 {string} delete success!
 // @Failure 403 id is empty
 // @Failure 400
-// @router /users/:id [delete]
-func (uc *UsersController) Delete() {
-	idStr := uc.Ctx.Input.Param(":id")
-	id, _ := strconv.ParseInt(idStr, 0, 64)
+// @router /users/deletes/:id([0-9]+) [delete]
+func (uc *UsersController) Deletes() {
+	idStr := uc.Ctx.Input.Params()
+	id, _ := strconv.ParseInt(idStr["0"], 0, 64)
+
 	if err := models.DeleteUsers(id); err == nil {
-		helper.JsonResponse(uc.Controller, http.StatusOK, 1, "ok", "")
+		helper.JsonResponse(uc.Controller, http.StatusOK, 1, helper.MappedData("user's data is deleted", nil), "")
 		return
 	} else {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.db"))
 		return
 	}
 }
@@ -253,48 +218,48 @@ func (uc *UsersController) Login() {
 
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.parsing"))
 		return
 	}
 
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 	if v.Email == "" {
 		if v.Mobile == "" {
-			helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Mobile or mail requires")
+			helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.login"))
 			return
 		} else {
 			us, err = models.FindUserByMobile(v.Mobile)
 
 			if err != nil {
-				helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
+				helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.db"))
 				return
 			}
 			ok, _ := helper.VerifyHashedData(v.Password, us.Password)
 			if !ok {
-				helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "invalid credential")
+				helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.credential"))
 				return
 			}
 		}
 	} else {
 		us, err = models.FindUserByEmail(v.Email)
 		if err != nil {
-			helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
+			helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.db"))
 			return
 		}
 
 		ok, _ := helper.VerifyHashedData(v.Password, us.Password)
 
 		if !ok {
-			helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "invalid credential")
+			helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.credential"))
 			return
 		}
 	}
-	err = sessions.Set(uc.Controller, "user", us.Email)
+	// err = sessions.Set(uc.Controller, "user", us.Email)
 
-	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while set session")
-		return
-	}
+	// if err != nil {
+	// 	helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.setsession"))
+	// 	return
+	// }
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": us.Id,
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
@@ -303,11 +268,11 @@ func (uc *UsersController) Login() {
 	accessToken, err := token.SignedString([]byte(conf.EnvConfig.JwtSecret))
 
 	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.accesstoken"))
 		return
 	}
 
-	helper.JsonResponse(uc.Controller, http.StatusOK, 1, map[string]interface{}{"data": &us, "token": accessToken}, "")
+	helper.JsonResponse(uc.Controller, http.StatusOK, 1, helper.MappedData("user is logged in", accessToken), "")
 }
 
 // ForgetPassword ...
@@ -323,13 +288,13 @@ func (uc *UsersController) ForgetPassword() {
 
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.parsing"))
 		return
 	}
 	up, err := helper.HashData(v.NewPassword)
 
 	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "faild to hashed password")
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.hashpassword"))
 		return
 	}
 
@@ -350,10 +315,10 @@ func (uc *UsersController) ForgetPassword() {
 func (uc *UsersController) SendOTP() {
 	var v request.SendOTP
 
-	// if err := uc.ParseForm(&v); err != nil {
-	// 	helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: "+err.Error())
-	// 	return
-	// }
+	if err := uc.ParseForm(&v); err != nil {
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.parsing"))
+		return
+	}
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 
 	userOTP := helper.GenerateOTP()
@@ -364,14 +329,14 @@ func (uc *UsersController) SendOTP() {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "")
 		return
 	}
-	// sent := helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
+	sent, _ := helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
 
-	// if !sent {
-	// 	helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "failed to send OTP")
-	// 	return
-	// }
+	if !sent {
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.sendotp"))
+		return
+	}
 
-	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "Otp Sent Successfully", "")
+	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "otp is sent", "")
 }
 
 // VerifyOTP ...
@@ -387,19 +352,26 @@ func (uc *UsersController) VerifyOTP() {
 
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, "Error while parsing form data: ")
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.parsing"))
 		return
 	}
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 	_, err := models.VerifyUserAndUpdate(v.Email, v.Otp)
 
 	if err != nil {
-		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.db"))
 		return
 	}
-	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "User Verification success", "")
+	helper.JsonResponse(uc.Controller, http.StatusOK, 1, "user's verification is completed", "")
 }
 
+// DemoSet ...
+// @Title DemoSet
+// @Description Demoset
+// @Success 200 {int} string
+// @Failure 403 body is empty
+// @Failure 400
+// @router /users/demoset [post]
 func (c *UsersController) DemoSet() {
 	err := c.SetSession("test", "hello")
 	if err != nil {
@@ -419,8 +391,16 @@ func (c *UsersController) DemoSet() {
 	helper.JsonResponse(c.Controller, http.StatusOK, 1, "set data", "")
 }
 
+// DemoGet ...
+// @Title DemoGet
+// @DescriptionDemoGet
+// @Param   Accept-Language  header  string  false  "Bearer YourAccessToken"
+// @Success 200 {int} string
+// @Failure 403 body is empty
+// @Failure 400
+// @router /users/demoget [get]
 func (c *UsersController) DemoGet() {
-	a := c.GetSession("test")
-	b := c.GetSession("test2")
-	helper.JsonResponse(c.Controller, 200, 1, map[string]interface{}{"a": a, "b": b}, "")
+	adata := helper.LanguageTranslate(c.Controller, "db")
+	bdata := helper.LanguageTranslate(c.Controller, "bye.bye")
+	helper.JsonResponse(c.Controller, 200, 1, map[string]interface{}{"a": adata, "b": bdata}, "")
 }

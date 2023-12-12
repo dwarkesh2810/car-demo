@@ -15,7 +15,6 @@ type UserUpdateRequest struct {
 	LastName  string ` json:"last_name" form:"last_name"`
 	Email     string ` json:"email" form:"email"`
 	Mobile    string ` json:"mobile" form:"mobile"`
-	Password  string ` json:"password" form:"password"`
 	Role      string ` json:"role" form:"role"`
 }
 

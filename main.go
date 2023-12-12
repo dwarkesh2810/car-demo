@@ -2,11 +2,8 @@ package main
 
 import (
 	"car_demo/conf"
-	"car_demo/export"
 	"car_demo/logger"
-	"car_demo/models"
 	_ "car_demo/routers"
-	"car_demo/sessions"
 	"car_demo/task"
 	"context"
 	"log"
@@ -22,12 +19,9 @@ import (
 func init() {
 	conf.LoadEnv(".")
 	orm.RegisterDriver("postgres", orm.DRPostgres)
-	orm.RegisterDataBase("default", "postgres", "user=postgres password=1234 dbname=postgres sslmode=disable")
+	orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
 	orm.RunSyncdb("default", false, true)
 	logger.Init()
-	sessions.SetSessionName("dexter")
-	sessions.SetSessionCookieLifeTime(60)
-	sessions.SetSessionGCMaxLifetime(60)
 }
 
 func main() {
@@ -35,20 +29,12 @@ func main() {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
-	task.CreateTask("test", "21 * * * * * ", Demo) //sec min hour day month weekday
-	var user models.Users
-	columns := []string{"Id", "FirstName", "LastName", "Email", "Mobile", "CreatedAt"}
 
-	// export.ExportToCSV(user, columns)
-	export.ExportToExcel(user, columns)
-	export.DbToPdf(user, columns)
+	task.CreateTask("test1", "0 42 15 * * *", Demo)
 	beego.Run()
-
-	// field := val.FieldByName("ID")
 }
 
 func Demo(c context.Context) error {
-	log.Print("Hello")
+	log.Print("hello")
 	return nil
-
 }

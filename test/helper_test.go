@@ -49,10 +49,10 @@ func TestSendMail(t *testing.T) {
 		subject := "test mail"
 		body := "hello, hw r u?"
 
-		sent := helper.SendMail(to, subject, body)
+		sent, err := helper.SendMail(to, subject, body)
 
 		if !sent {
-			t.Fatalf("failed to send mail")
+			t.Fatalf("failed to send mail %v", err)
 		}
 	})
 }

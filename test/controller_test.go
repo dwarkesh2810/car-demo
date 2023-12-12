@@ -42,7 +42,7 @@ func TestGetAll(t *testing.T) {
 
 	t.Run("GetAll", func(t *testing.T) {
 		Ctrl := &controllers.UsersController{}
-		endPoint := "/v1/user/"
+		endPoint := "/v1/user/getall"
 		mappedMethod := "GetAll"
 		token := ""
 		method := "GET"
@@ -63,10 +63,11 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestSendOTP(t *testing.T) {
-
+	AddUser()
 	t.Run("SendOTP", func(t *testing.T) {
+
 		Ctrl := &controllers.UsersController{}
-		endPoints := "/v1/user/sendotp"
+		endPoints := "/v1/users/sendotp"
 		var jsonStr = []byte(`{"email":"dwarkesh0007@gmail.com"}`)
 		token := ""
 		method := "POST"
@@ -86,7 +87,7 @@ func TestVerifyOtp(t *testing.T) {
 	t.Run("VerifyOtp", func(t *testing.T) {
 		Ctrl := &controllers.UsersController{}
 		endPoints := "/v1/user/verifyotp"
-		var jsonStr = []byte(`{"email":"dwarkesh0007@gmail.com","otp":"310376"}`)
+		var jsonStr = []byte(`{"email":"dwarkesh0007@gmail.com","otp":"46314"}`)
 		token := ""
 		method := "POST"
 		mappedMethod := "VerifyOTP"

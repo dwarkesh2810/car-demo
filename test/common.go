@@ -5,6 +5,7 @@ import (
 	"car_demo/conf"
 	"car_demo/helper"
 	"car_demo/middleware"
+	"car_demo/models"
 	"car_demo/request"
 	"encoding/json"
 	"fmt"
@@ -26,7 +27,7 @@ import (
 func init() {
 	conf.LoadEnv("..")
 	orm.RegisterDriver("postgres", orm.DRPostgres)
-	orm.RegisterDataBase("default", "postgres", "user=postgres password=1234 dbname=postgres sslmode=disable")
+	orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
 	orm.RunSyncdb("default", false, true)
 
 	_, file, _, _ := runtime.Caller(0)
@@ -39,6 +40,7 @@ func ClearData(tableName string) error {
 	o := orm.NewOrm()
 	// Construct the SQL query to truncate the table
 	query := fmt.Sprintf("TRUNCATE TABLE %s", tableName)
+	query1 := "ALTER SEQUENCE users_id_seq RESTART WITH 1"
 
 	// Execute the raw SQL query to truncate the table
 	_, err := o.Raw(query).Exec()
@@ -46,6 +48,13 @@ func ClearData(tableName string) error {
 		fmt.Println("Error:", err)
 		return err
 	}
+
+	_, err = o.Raw(query1).Exec()
+	if err != nil {
+		fmt.Println("Error1:", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -53,7 +62,7 @@ func UserCreateData() *request.CreateUserRequest {
 	return &request.CreateUserRequest{
 		FirstName: "Dexter",
 		LastName:  "Pat",
-		Email:     "dwarkesh01007@gmail.com",
+		Email:     "dwarkesh0007@gmail.com",
 		Mobile:    "1235465415656",
 		Password:  "123456",
 		Role:      "user",
@@ -97,4 +106,9 @@ func GetresponseDate(body *bytes.Buffer) (map[string]interface{}, error) {
 	}
 	resp := map[int]interface{}{1: u.Data}
 	return resp[1].(map[string]interface{}), nil
+}
+
+func AddUser() {
+	user := UserCreateData()
+	models.AddUsers(user)
 }

@@ -16,11 +16,6 @@ type MsgController struct {
 	beego.Controller
 }
 
-func (c *MsgController) URLMapping() {
-	c.Mapping("SendSMS", c.SendSMS)
-	c.Mapping("VerifySMS", c.VerifySMS)
-}
-
 var AccountSID string
 var AuthToken string
 var ServiceID string

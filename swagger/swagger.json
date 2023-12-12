@@ -223,6 +223,83 @@
                 }
             }
         },
+        "/users/deletes/{id}": {
+            "delete": {
+                "tags": [
+                    "car_demo/controllersUsersController"
+                ],
+                "description": "delete the Users\n\u003cbr\u003e",
+                "operationId": "UsersController.Delete",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "description": "The id you want to delete",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{string} delete success!"
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": "id is empty"
+                    }
+                }
+            }
+        },
+        "/users/demoget": {
+            "get": {
+                "tags": [
+                    "car_demo/controllersUsersController"
+                ],
+                "description": "DemoGet\n\u003cbr\u003e",
+                "operationId": "UsersController.DemoGet",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "Accept-Language",
+                        "description": "Bearer YourAccessToken",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{int} string"
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
+        "/users/demoset": {
+            "post": {
+                "tags": [
+                    "car_demo/controllersUsersController"
+                ],
+                "description": "Demoset\n\u003cbr\u003e",
+                "operationId": "UsersController.DemoSet",
+                "responses": {
+                    "200": {
+                        "description": "{int} string"
+                    },
+                    "400": {
+                        "description": ""
+                    },
+                    "403": {
+                        "description": "body is empty"
+                    }
+                }
+            }
+        },
         "/users/forgot_password": {
             "post": {
                 "tags": [
@@ -435,38 +512,7 @@
                 }
             }
         },
-        "/users/verifyotp": {
-            "post": {
-                "tags": [
-                    "car_demo/controllersUsersController"
-                ],
-                "description": "Verify OTP\n\u003cbr\u003e",
-                "operationId": "UsersController.Post",
-                "parameters": [
-                    {
-                        "in": "body",
-                        "name": "body",
-                        "description": "body for Users content",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.VerifyOTP"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{int} string"
-                    },
-                    "400": {
-                        "description": ""
-                    },
-                    "403": {
-                        "description": "body is empty"
-                    }
-                }
-            }
-        },
-        "/users/{id}": {
+        "/users/update": {
             "put": {
                 "tags": [
                     "car_demo/controllersUsersController"
@@ -505,31 +551,35 @@
                         "description": ":id is not int"
                     }
                 }
-            },
-            "delete": {
+            }
+        },
+        "/users/verifyotp": {
+            "post": {
                 "tags": [
                     "car_demo/controllersUsersController"
                 ],
-                "description": "delete the Users\n\u003cbr\u003e",
-                "operationId": "UsersController.Delete",
+                "description": "Verify OTP\n\u003cbr\u003e",
+                "operationId": "UsersController.Post",
                 "parameters": [
                     {
-                        "in": "path",
-                        "name": "id",
-                        "description": "The id you want to delete",
+                        "in": "body",
+                        "name": "body",
+                        "description": "body for Users content",
                         "required": true,
-                        "type": "string"
+                        "schema": {
+                            "$ref": "#/definitions/request.VerifyOTP"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{string} delete success!"
+                        "description": "{int} string"
                     },
                     "400": {
                         "description": ""
                     },
                     "403": {
-                        "description": "id is empty"
+                        "description": "body is empty"
                     }
                 }
             }
@@ -715,9 +765,6 @@
                     "type": "string"
                 },
                 "mobile": {
-                    "type": "string"
-                },
-                "password": {
                     "type": "string"
                 },
                 "role": {

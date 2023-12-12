@@ -26,6 +26,52 @@ END;
 $$
 
 
+CREATE OR REPLACE FUNCTION insert_update_users(
+    p_users_data userdata[]
+)
+RETURNS TABLE (
+    first_name VARCHAR(100),
+    user_email VARCHAR(100),
+    user_mobile VARCHAR(20)
+    
+) AS $$
+DECLARE
+    user_information usersdata;
+    user_data_record usersdata;
+BEGIN
+    FOR user_data_record IN SELECT * FROM UNNEST(p_users_data) AS t
+    LOOP
+        IF EXISTS(SELECT 1 FROM users WHERE email = user_data_record.user_email) THEN
+            UPDATE users
+            SET 
+                first_name = user_data_record.first_name,
+                -- last_name = user_data_record.last_name,
+                email = user_data_record.user_email,
+                -- password = user_data_record.password,
+                mobile = user_data_record.user_mobile
+            WHERE email = user_data_record.user_email;
+        ELSE
+            INSERT INTO users (first_name, email, mobile)
+            VALUES (user_data_record.first_name,
+                    -- user_data_record.last_name, 
+                    user_data_record.user_email, 
+                    -- user_data_record.password, 
+                    user_data_record.user_mobile)
+            RETURNING user_data_record.first_name AS first_name, 
+                      user_data_record.email AS user_email,
+                      user_data_record.user_mobile AS user_mobile
+            INTO user_information;
+
+            RETURN NEXT;
+        END IF;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT * FROM insert_update_users(ARRAY[
+    ROW('John', 'john@example.com', '1234567890'::VARCHAR),
+    ROW('Jane', 'jane@example.com', '9876543210'::VARCHAR)
+]::userdata[]);
 -- drop table if exists accounts;
 
 -- create table accounts (
@@ -67,9 +113,6 @@ $$
 
 -- select * from accounts;
 
-
-
-
 -- create [or replace] procedure procedure_name(parameter_list)
 -- language plpgsql
 -- as $$
@@ -79,6 +122,77 @@ $$
 -- -- stored procedure body
 -- end; $$
 
+-- Table accounts as A {
+--   id bigint [pk]
+--   owner varchar [not null]
+--   balance  bigint [not null]
+--   currency varchar [not null]
+--   created_at timestamp 
 
+--   Indexes{
+--     owner
+--   }
+  
+-- }
 
+-- Table entries {
+--   id bigint [pk]
+--   account_id bigint [ref: > A.id]
+--   amount bigint [not null, note: "it can be nagetive or positive"]
+--   created_at timestamp 
 
+--   Indexes{
+--     account_id
+--   }
+-- }
+
+-- Table transfers {
+--   id bigint [pk]
+--   from_account_id bigint [ref: > A.id]
+--   to_account_id bigint [ref: > A.id]
+--   amount bigint [not null, note: "must be positive"]
+--   created_at timestamp
+
+--   Indexes{
+--     from_account_id
+--     to_account_id
+--     (from_account_id, to_account_id)
+--   }
+-- }
+
+-- CREATE OR REPLACE FUNCTION insert_update_users(
+--     p_users_data users_datas[]
+-- )
+-- RETURNS TABLE (
+--     user_id INT,
+--     user_name VARCHAR(255),
+--     user_email VARCHAR(255)
+-- ) AS $$
+-- DECLARE
+--     user_information user_datas;
+--     user_data_record users_datas;
+-- BEGIN
+--     FOREACH user_data IN SELECT * FROM ARRAY p_users_data 
+--     LOOP
+--         IF EXISTS(SELECT 1 FROM users WHERE user_fun_id = user_data.user_id) THEN
+--             UPDATE users_func
+--             SET 
+--                 first_name = user_data.first_name,
+--                 last_name = user_data.last_name,
+--                 email = user_data.email,
+--                 password = user_data.password,
+--                 mobile = user_data.mobile
+--             WHERE user_fun_id = user_data.user_id;
+--         ELSE
+--             INSERT INTO users_func (first_name, last_name, email, password, mobile)
+--             VALUES (user_data.first_name, user_data.last_name, user_data.email, user_data.password, user_data.mobile)
+--             RETURNING user_fun_id AS user_id, 
+--                       CONCAT(first_name, ' ', last_name) AS user_name, 
+--                       email AS user_email 
+--             INTO user_information;
+--         END IF;
+        
+--         RETURN NEXT;
+--     END LOOP;
+-- END;
+-- $$ LANGUAGE plpgsql; 

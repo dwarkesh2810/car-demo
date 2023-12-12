@@ -11,16 +11,29 @@ import (
 	"car_demo/controllers"
 	"car_demo/middleware"
 
+	"github.com/beego/beego/v2/core/logs"
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/beego/i18n"
 )
 
 func init() {
+
+	langs := []string{"en-US", "zh-CN", "hi-IN"} // List of supported languages
+
+	for _, lang := range langs {
+		if err := i18n.SetMessage(lang, "conf/locale_"+lang+".ini"); err != nil {
+			// logger.Error("Fail to set message file:", err)
+			logs.Error("Fail to set message file:", err)
+			return
+		}
+	}
 
 	uc := &controllers.UsersController{}
 	// mc := &controllers.MsgController{}
 	cc := &controllers.Car_masterController{}
 
 	ns := beego.NewNamespace("/v1",
+
 		beego.NSAutoRouter(uc),
 		// beego.NSAutoRouter(mc),
 		beego.NSInclude(uc),
@@ -45,12 +58,15 @@ func init() {
 		// beego.NSBefore(middleware.Auth),
 	)
 
-	beego.Router("/demoset", uc, "get:DemoSet")
+	beego.Router("/demoset", uc, "post:DemoSet")
 	beego.Router("/demoget", uc, "get:DemoGet")
 
 	beego.InsertFilter("/v1/car_master/create", beego.BeforeRouter, middleware.Auth)
+	beego.InsertFilter("*", beego.BeforeRouter, middleware.LanguageMiddleware)
 	// beego.Router("v1/users/getone/?:id", uc, "get:GetOne")
 
 	beego.AddNamespace(ns)
 	beego.AddNamespace(n1)
 }
+
+// beei18n sync locale_en-US.ini locale_zh-CN.ini

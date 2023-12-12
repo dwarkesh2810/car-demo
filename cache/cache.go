@@ -11,12 +11,12 @@ import (
 )
 
 var memoryCacheProvider cache.Cache
-var fileCacheConfig *cache.FileCache
+var fileCacheProvider *cache.FileCache
 var memcacheProvider cache.Cache
 
 func init() {
 	memoryCacheProvider, _ = cache.NewCache("memory", `{"interval":60}`)
-	fileCacheConfig = &cache.FileCache{
+	fileCacheProvider = &cache.FileCache{
 		CachePath:  "caches",
 		FileSuffix: ".cache",
 	}
@@ -29,7 +29,7 @@ func Set(cacheType, key string, value interface{}, expire time.Duration) error {
 		return memoryCacheProvider.Put(context.Background(), key, value, expire)
 
 	case "file":
-		return fileCacheConfig.Put(context.Background(), key, value, expire)
+		return fileCacheProvider.Put(context.Background(), key, value, expire)
 
 	case "memcache":
 		val, err := InterfaceToBytes(value)
@@ -43,26 +43,13 @@ func Set(cacheType, key string, value interface{}, expire time.Duration) error {
 	}
 }
 
-func InterfaceToBytes(data interface{}) ([]byte, error) {
-
-	switch v := data.(type) {
-	case string:
-		return []byte(v), nil
-
-	default:
-		return json.Marshal(data)
-	}
-}
-
 func Get(cacheType, key string) (interface{}, error) {
-
 	switch cacheType {
 	case "memory":
-		// memcacheProvider.Decr()
 		return memoryCacheProvider.Get(context.Background(), key)
 
 	case "file":
-		return fileCacheConfig.Get(context.Background(), key)
+		return fileCacheProvider.Get(context.Background(), key)
 
 	case "memcache":
 		return memcacheProvider.Get(context.Background(), key)
@@ -78,10 +65,9 @@ func Delete(cacheType, key string) error {
 		return memoryCacheProvider.Delete(context.Background(), key)
 
 	case "file":
-		return fileCacheConfig.Delete(context.Background(), key)
+		return fileCacheProvider.Delete(context.Background(), key)
 
 	case "memcache":
-
 		return memcacheProvider.Delete(context.Background(), key)
 
 	default:
@@ -95,7 +81,7 @@ func IsExist(cacheType, key string) (bool, error) {
 		return memoryCacheProvider.IsExist(context.Background(), key)
 
 	case "file":
-		return fileCacheConfig.IsExist(context.Background(), key)
+		return fileCacheProvider.IsExist(context.Background(), key)
 
 	case "memcache":
 		return memcacheProvider.IsExist(context.Background(), key)
@@ -111,7 +97,7 @@ func ClearAll() error {
 	if err != nil {
 		return err
 	}
-	err = fileCacheConfig.ClearAll(context.Background())
+	err = fileCacheProvider.ClearAll(context.Background())
 	if err != nil {
 		return err
 	}
@@ -120,4 +106,15 @@ func ClearAll() error {
 		return err
 	}
 	return nil
+}
+
+func InterfaceToBytes(data interface{}) ([]byte, error) {
+
+	switch v := data.(type) {
+	case string:
+		return []byte(v), nil
+
+	default:
+		return json.Marshal(data)
+	}
 }

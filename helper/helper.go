@@ -13,6 +13,7 @@ import (
 
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/beego/beego/v2/server/web/context"
+	"github.com/beego/i18n"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -102,7 +103,7 @@ func GetFileAndStore(uc beego.Controller, file string, pathName string, path str
 	return pathForDatabase + hd.Filename, nil
 }
 
-func SendMail(to string, subject, body string) bool {
+func SendMail(to string, subject, body string) (bool, error) {
 	from := conf.EnvConfig.From
 	password := conf.EnvConfig.Password
 
@@ -119,8 +120,16 @@ func SendMail(to string, subject, body string) bool {
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
 	if err != nil {
 		log.Fatal(err)
-		return false
+		return false, err
 	}
-	return true
+	return true, nil
 }
 
+func MappedData(message string, data interface{}) map[string]interface{} {
+	return map[string]interface{}{"message": message, "data": data}
+}
+
+func LanguageTranslate(c beego.Controller, key string) string {
+	lang := c.Ctx.Input.GetData("lang").(string)
+	return i18n.Tr(lang, key)
+}

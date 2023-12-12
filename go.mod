@@ -5,6 +5,7 @@ go 1.21
 require github.com/beego/beego/v2 v2.1.4
 
 require (
+	github.com/beego/i18n v0.0.0-20161101132742-e9308947f407
 	github.com/golang-jwt/jwt/v5 v5.1.0
 	github.com/lib/pq v1.10.9
 	github.com/smartystreets/goconvey v1.6.4
@@ -13,6 +14,7 @@ require (
 )
 
 require (
+	github.com/Unknwon/goconfig v1.0.0 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect

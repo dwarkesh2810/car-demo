@@ -95,7 +95,7 @@ func GetAllUsers(query map[string]string, fields []string, sortby []string, orde
 				} else if order[i] == "asc" {
 					orderby = v
 				} else {
-					return nil, errors.New("Error: Invalid order. Must be either [asc|desc]")
+					return nil, errors.New("error: Invalid order. Must be either [asc|desc]")
 				}
 				sortFields = append(sortFields, orderby)
 			}
@@ -109,16 +109,16 @@ func GetAllUsers(query map[string]string, fields []string, sortby []string, orde
 				} else if order[0] == "asc" {
 					orderby = v
 				} else {
-					return nil, errors.New("Error: Invalid order. Must be either [asc|desc]")
+					return nil, errors.New("error: Invalid order. Must be either [asc|desc]")
 				}
 				sortFields = append(sortFields, orderby)
 			}
 		} else if len(sortby) != len(order) && len(order) != 1 {
-			return nil, errors.New("Error: 'sortby', 'order' sizes mismatch or 'order' size is not 1")
+			return nil, errors.New("error: 'sortby', 'order' sizes mismatch or 'order' size is not 1")
 		}
 	} else {
 		if len(order) != 0 {
-			return nil, errors.New("Error: unused 'order' fields")
+			return nil, errors.New("error: unused 'order' fields")
 		}
 	}
 
@@ -153,7 +153,6 @@ func UpdateUsersById(m *request.UserUpdateRequest) (err error) {
 
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
-
 		v.FirstName = m.FirstName
 		v.LastName = m.LastName
 		v.Email = m.Email
@@ -172,7 +171,7 @@ func UpdateUsersById(m *request.UserUpdateRequest) (err error) {
 func DeleteUsers(id int64) (err error) {
 	o := orm.NewOrm()
 	v := Users{Id: id}
-	// ascertain id exists in the database
+
 	if err = o.Read(&v); err == nil {
 		var num int64
 		if num, err = o.Delete(&Users{Id: id}); err == nil {
@@ -229,7 +228,7 @@ func VerifyUserAndUpdate(email string, otp string) (*Users, error) {
 
 	if !verify {
 		tx.Rollback()
-		return nil, errors.New("Wrong OTP")
+		return nil, errors.New("wrong OTP")
 	}
 
 	data.Status = 1
@@ -299,7 +298,7 @@ func UserPasswordUpdate(email string, password string, otp string) (*Users, erro
 
 	if !verify {
 		tx.Rollback()
-		return nil, errors.New("Wrong OTP")
+		return nil, errors.New("wrong OTP")
 	}
 
 	data.Password = password
@@ -336,7 +335,7 @@ func UserPasswordReset(email, currentPassword, NewPassword string) (*Users, erro
 
 	if !verify {
 		tx.Rollback()
-		return nil, errors.New("Wrong Password")
+		return nil, errors.New("wrong Password")
 	}
 
 	data.Password = NewPassword

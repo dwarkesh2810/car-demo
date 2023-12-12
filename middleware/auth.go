@@ -70,3 +70,12 @@ func Auth(c *context.Context) {
 		return
 	}
 }
+
+// func (ctx *context.Context) {
+// 	lang := ctx.Input.Header("Accept-Language")
+// 	if lang == "" {
+// 		lang = "en-US"
+// 	}
+// 	ctx.Input.SetData("lang", lang)
+// 	a := ctx.Input.GetData("lang")
+// }

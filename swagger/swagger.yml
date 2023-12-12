@@ -162,35 +162,7 @@ paths:
             $ref: '#/definitions/models.Car_master'
         "403":
           description: ""
-  /users/{id}:
-    put:
-      tags:
-      - car_demo/controllersUsersController
-      description: |-
-        update the Users
-        <br>
-      operationId: UsersController.Put
-      parameters:
-      - in: path
-        name: id
-        description: The id you want to update
-        required: true
-        type: string
-      - in: body
-        name: body
-        description: body for Users content
-        required: true
-        schema:
-          $ref: '#/definitions/request.UserUpdateRequest'
-      responses:
-        "200":
-          description: ""
-          schema:
-            type: string
-        "400":
-          description: ""
-        "403":
-          description: :id is not int
+  /users/deletes/{id}:
     delete:
       tags:
       - car_demo/controllersUsersController
@@ -211,6 +183,41 @@ paths:
           description: ""
         "403":
           description: id is empty
+  /users/demoget:
+    get:
+      tags:
+      - car_demo/controllersUsersController
+      description: |-
+        DemoGet
+        <br>
+      operationId: UsersController.DemoGet
+      parameters:
+      - in: header
+        name: Accept-Language
+        description: Bearer YourAccessToken
+        type: string
+      responses:
+        "200":
+          description: '{int} string'
+        "400":
+          description: ""
+        "403":
+          description: body is empty
+  /users/demoset:
+    post:
+      tags:
+      - car_demo/controllersUsersController
+      description: |-
+        Demoset
+        <br>
+      operationId: UsersController.DemoSet
+      responses:
+        "200":
+          description: '{int} string'
+        "400":
+          description: ""
+        "403":
+          description: body is empty
   /users/forgot_password:
     post:
       tags:
@@ -362,6 +369,35 @@ paths:
           description: ""
         "403":
           description: body is empty
+  /users/update:
+    put:
+      tags:
+      - car_demo/controllersUsersController
+      description: |-
+        update the Users
+        <br>
+      operationId: UsersController.Put
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Users content
+        required: true
+        schema:
+          $ref: '#/definitions/request.UserUpdateRequest'
+      responses:
+        "200":
+          description: ""
+          schema:
+            type: string
+        "400":
+          description: ""
+        "403":
+          description: :id is not int
   /users/verifyotp:
     post:
       tags:
@@ -511,8 +547,6 @@ definitions:
       last_name:
         type: string
       mobile:
-        type: string
-      password:
         type: string
       role:
         type: string

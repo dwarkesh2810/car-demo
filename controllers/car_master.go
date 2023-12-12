@@ -6,7 +6,6 @@ import (
 	"car_demo/models"
 	"car_demo/request"
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -20,16 +19,7 @@ type Car_masterController struct {
 	beego.Controller
 }
 
-// // URLMapping ...
-// func (c *Car_masterController) URLMapping() {
-// 	c.Mapping("Post", c.Post)
-// 	c.Mapping("GetOne", c.GetOne)
-// 	c.Mapping("GetAll", c.GetAll)
-// 	c.Mapping("Put", c.Put)
-// 	c.Mapping("Delete", c.Delete)
-// }
-
-// Post ...
+// Create ...
 // @Title Post
 // @Description create Car_master
 // @Param	car_name		formData 	string	true		"body for Car_master content"
@@ -49,19 +39,17 @@ func (c *Car_masterController) Create() {
 
 	if err := c.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
-		c.Ctx.WriteString("Error while parsing form data: " + err.Error())
+		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(c.Controller, "error.parsing"))
 		return
 	}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 	imgPath, err := helper.GetFileAndStore(c.Controller, "ufile", "cars", string(v.CarType))
 
 	if err != nil {
-		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(c.Controller, "error.db"))
 		return
 	}
 
-	log.Print("----------------------------------------------------------------------------", v)
-	// imgPath := "assets/img/cars/sedan/HuracanModelImage.jpg"
 	var u models.Car_master = models.Car_master{
 		CarName:   v.CarName,
 		CarImage:  imgPath,
@@ -75,14 +63,14 @@ func (c *Car_masterController) Create() {
 	switch u.CarType {
 	case models.Hatchback, models.SUV, models.Sedan:
 		if _, err := models.AddCar_master(&u); err == nil {
-			helper.JsonResponse(c.Controller, http.StatusCreated, 1, dto.DtOAddCarResponse(&u), "")
+			helper.JsonResponse(c.Controller, http.StatusCreated, 1, helper.MappedData("created", dto.DtOAddCarResponse(&u)), "")
 			return
 		} else {
-			helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
+			helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(c.Controller, "error.db"))
 			return
 		}
 	default:
-		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, "invalid car type")
+		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(c.Controller, "error.cartype"))
 		return
 	}
 
@@ -100,10 +88,10 @@ func (c *Car_masterController) GetOne() {
 	id, _ := strconv.ParseInt(idStr, 0, 64)
 	v, err := models.GetCar_masterById(id)
 	if err != nil {
-		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(c.Controller, "error.db"))
 		return
 	} else {
-		helper.JsonResponse(c.Controller, http.StatusOK, 1, v, "")
+		helper.JsonResponse(c.Controller, http.StatusOK, 1, helper.MappedData("car data", v), "")
 		return
 	}
 }
@@ -153,7 +141,7 @@ func (c *Car_masterController) GetAll() {
 		for _, cond := range strings.Split(v, ",") {
 			kv := strings.SplitN(cond, ":", 2)
 			if len(kv) != 2 {
-				helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, "invalid query key/value pair")
+				helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(c.Controller, "error.query"))
 				return
 			}
 			k, v := kv[0], kv[1]
@@ -163,10 +151,10 @@ func (c *Car_masterController) GetAll() {
 
 	l, err := models.GetAllCar_master(query, fields, sortby, order, offset, limit)
 	if err != nil {
-		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(c.Controller, "error.db"))
 		return
 	} else {
-		helper.JsonResponse(c.Controller, http.StatusOK, 1, l, "")
+		helper.JsonResponse(c.Controller, http.StatusOK, 1, helper.MappedData("all cars data", l), "")
 		return
 	}
 }
@@ -189,14 +177,14 @@ func (c *Car_masterController) Put() {
 	switch v.CarType {
 	case models.Hatchback, models.SUV, models.Sedan:
 		if err := models.UpdateCar_masterById(&v); err == nil {
-			helper.JsonResponse(c.Controller, http.StatusOK, 1, "OK", "")
+			helper.JsonResponse(c.Controller, http.StatusOK, 1, "car data is updated", "")
 			return
 		} else {
-			helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
+			helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(c.Controller, "error.db"))
 			return
 		}
 	default:
-		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, "invalid car type")
+		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(c.Controller, "error.cartype"))
 		return
 	}
 }
@@ -212,10 +200,10 @@ func (c *Car_masterController) Delete() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
 	if err := models.DeleteCar_master(id); err == nil {
-		helper.JsonResponse(c.Controller, http.StatusOK, 1, "OK", "")
+		helper.JsonResponse(c.Controller, http.StatusOK, 1, "car data is deleted", "")
 		return
 	} else {
-		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, err.Error())
+		helper.JsonResponse(c.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(c.Controller, "error.db"))
 		return
 	}
 }

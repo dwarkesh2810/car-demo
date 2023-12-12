@@ -1,45 +1,33 @@
 package test
 
 import (
-	"car_demo/conf"
 	"car_demo/models"
 	"car_demo/request"
 	"log"
 	"testing"
 
-	"github.com/beego/beego/v2/client/orm"
 	_ "github.com/lib/pq"
 )
 
-// type TUsers struct {
-// 	Id        int64  `orm:"auto"`
-// 	FirstName string `orm:"size(128)" json:"first_name" form:"first_name"`
-// 	LastName  string `orm:"size(128)" json:"last_name" form:"last_name"`
-// 	Email     string `orm:"size(128)" json:"email" form:"email"`
-// 	Mobile    string `json:"mobile" form:"mobile"`
-// 	Password  string `orm:"size(128)" json:"password" form:"password"`
-// 	Status    int    `orm:"" json:"status" form:"status"`
-// 	Role      string `orm:"size(20)" json:"role" form:"role"`
-// 	Otp       string `orm:"size(20)" json:"otp" form:"otp"`
-// 	CreatedAt int64
-// 	UpdatedAt int64
-// 	DeletedAt int64
+// func Init() {
+// 	conf.LoadEnv("..")
+// 	orm.RegisterDriver("postgres", orm.DRPostgres)
+// 	orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
+// 	orm.RunSyncdb("default", false, true)
 // }
 
-func Init() {
-	conf.LoadEnv("..")
-	orm.RegisterDriver("postgres", orm.DRPostgres)
-	orm.RegisterDataBase("default", "postgres", "user=postgres password=1234 dbname=postgres sslmode=disable")
-	orm.RunSyncdb("default", false, true)
-}
-
 func TestIsExistingUser(t *testing.T) {
-	Init()
+
+	user := UserCreateData()
+	models.AddUsers(user)
+
 	t.Run("Existing User", func(t *testing.T) {
-		email := "dwarkesh0007@gmail.com"
-		mobile := "12345648"
+		email := "dwarkesh01007@gmail.com"
+		mobile := "1235465415656"
 
 		result := models.IsExistingUser(email, mobile)
+
+		log.Print("result", result)
 		expected := true
 		if result != expected {
 			t.Fatal("expected true but got false ")
@@ -59,8 +47,6 @@ func TestIsExistingUser(t *testing.T) {
 }
 
 func TestAddUser(t *testing.T) {
-	Init()
-	ClearData("users")
 	t.Run("Add User", func(t *testing.T) {
 
 		user := UserCreateData()
@@ -74,20 +60,16 @@ func TestAddUser(t *testing.T) {
 		var offset int64
 
 		users, _ := models.GetAllUsers(query, fields, sortby, order, offset, limit)
+
 		last_id := users[0].(models.Users).Id
 
 		if id != last_id {
 			t.Fatal("failed to Add user")
 		}
-
-		// models.GetAllUsers(order []string {"desc"})
-
 	})
 }
 
 func TestFindUserByEmail(t *testing.T) {
-	Init()
-	ClearData("users")
 	t.Run("Find User By Email", func(t *testing.T) {
 
 		user := UserCreateData()
@@ -100,13 +82,10 @@ func TestFindUserByEmail(t *testing.T) {
 		if !result {
 			t.Fatalf("function not working as expected ")
 		}
-
 	})
 }
 
 func TestFindUserByMobile(t *testing.T) {
-	Init()
-	ClearData("users")
 	t.Run("Find User By Mobile", func(t *testing.T) {
 
 		user := UserCreateData()
@@ -121,13 +100,10 @@ func TestFindUserByMobile(t *testing.T) {
 		if !result {
 			t.Fatalf("function not working as expected ")
 		}
-
 	})
 }
 
 func TestUpdateUsersById(t *testing.T) {
-	Init()
-	ClearData("users")
 	t.Run("Update User By Id", func(t *testing.T) {
 
 		user := UserCreateData()
@@ -138,8 +114,6 @@ func TestUpdateUsersById(t *testing.T) {
 
 		models.UpdateUsersById(uUser)
 		a, _ := models.GetUsersById(id)
-		log.Print(a)
-		log.Print(uUser)
 		if a.Email != uUser.Email {
 			t.Fatalf("function not working as expected ")
 		}
@@ -155,7 +129,5 @@ func UserUpdateData(id int64) *request.UserUpdateRequest {
 		Mobile:    "1232131232",
 		Role:      "user",
 		Id:        id,
-		Password:  "123456",
 	}
-
 }

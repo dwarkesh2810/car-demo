@@ -23,10 +23,6 @@ type Car_master struct {
 
 type CarType string
 
-func (c *Car_master) TableName() string {
-    return "cars"
-}
-
 const (
 	Sedan     CarType = "sedan"
 	Hatchback CarType = "hatchback"
