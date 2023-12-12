@@ -2,6 +2,7 @@ package main
 
 import (
 	"car_demo/conf"
+	"car_demo/healthcheck"
 	"car_demo/logger"
 	_ "car_demo/routers"
 	"car_demo/task"
@@ -9,6 +10,7 @@ import (
 	"log"
 
 	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/admin"
 
 	// // _ "github.com/beego/beego/v2/server/web/swagger"
 
@@ -29,7 +31,7 @@ func main() {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
-
+	admin.AddHealthCheck("database", &healthcheck.DatabaseCheck{})
 	task.CreateTask("test1", "0 42 15 * * *", Demo)
 	beego.Run()
 }

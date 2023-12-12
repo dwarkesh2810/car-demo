@@ -400,7 +400,7 @@ func (c *UsersController) DemoSet() {
 // @Failure 400
 // @router /users/demoget [get]
 func (c *UsersController) DemoGet() {
-	adata := helper.LanguageTranslate(c.Controller, "db")
+	adata := helper.LanguageTranslate(c.Controller, "error.db")
 	bdata := helper.LanguageTranslate(c.Controller, "bye.bye")
 	helper.JsonResponse(c.Controller, 200, 1, map[string]interface{}{"a": adata, "b": bdata}, "")
 }
