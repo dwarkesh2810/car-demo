@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os/exec"
+	"reflect"
 
 	"net/smtp"
 	"os"
@@ -151,4 +153,85 @@ func SecondsToDayHourMinAndSeconds(seconds int) (int64, int64, int64, int64) {
 	minute := (seconds % 3600) / 60
 	second := seconds % 60
 	return int64(days), int64(hour), int64(minute), int64(second)
+}
+
+func GenerateModel(field interface{}, name string) bool {
+	modelType := reflect.TypeOf(field)
+
+	// Construct the -fields string based on the struct fields and types
+	var fields []string
+	for i := 0; i < modelType.NumField(); i++ {
+		field := modelType.Field(i)
+		fields = append(fields, fmt.Sprintf("%s:%s", field.Name, field.Type))
+	}
+
+	// Join the fields into a comma-separated string
+	fieldsStr := strings.Join(fields, ",")
+
+	// Run the bee generate model command with dynamically generated -fields argument
+	cmd := exec.Command("bee", "generate", "model", name, "-fields="+fieldsStr)
+
+	// Set output capture
+	cmdOutput, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Error executing command:", err)
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			fmt.Println("Exit status:", exitErr.ExitCode())
+			fmt.Println("Command output:", string(cmdOutput))
+			return false
+		}
+		return false
+	}
+	return true
+}
+
+func GenerateController(name string) bool {
+
+	// Run the bee generate model command with dynamically generated -fields argument
+	cmd := exec.Command("bee", "generate", "controller", name)
+
+	// Set output capture
+	cmdOutput, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Error executing command:", err)
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			fmt.Println("Exit status:", exitErr.ExitCode())
+			fmt.Println("Command output:", string(cmdOutput))
+			return false
+		}
+		return false
+	}
+	return true
+}
+
+func GenerateMigration(field interface{}, name string, driver string, conn string) bool {
+	modelType := reflect.TypeOf(field)
+
+	// Construct the -fields string based on the struct fields and types
+	var fields []string
+	for i := 0; i < modelType.NumField(); i++ {
+		field := modelType.Field(i)
+		fields = append(fields, fmt.Sprintf("%s:%s", field.Name, field.Type))
+	}
+
+	// Join the fields into a comma-separated string
+	fieldsStr := strings.Join(fields, ",")
+
+	// Run the bee generate model command with dynamically generated -fields argument
+	cmd := exec.Command("bee", "generate", "migration", name, "-fields="+fieldsStr, "-driver="+driver, "-conn="+conn)
+
+	fmt.Println(cmd)
+
+	// Set output capture
+	cmdOutput, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println("Error executing command:", err)
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			fmt.Println("Exit status:", exitErr.ExitCode())
+			fmt.Println("Command output:", string(cmdOutput))
+			return false
+		}
+		return false
+	}
+	return true
 }
