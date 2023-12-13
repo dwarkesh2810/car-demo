@@ -38,7 +38,7 @@ func main() {
 }
 
 func Demo(c context.Context) error {
-	// imports.Seed(10)
+	// imports.Seed(25)
 	log.Print("hello")
 	return nil
 }

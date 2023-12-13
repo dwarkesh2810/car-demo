@@ -67,9 +67,9 @@ func RateLimiter(ctx *context.Context) {
 
 		remainingSeconds := unBlocked[ip] - time.Now().Unix()
 
-		min, sec := helper.SecondsToMinutesAndSeconds(remainingSeconds)
+		day, hr, min, sec := helper.SecondsToDayHourMinAndSeconds(int(remainingSeconds))
 
-		message := fmt.Sprintf("Too many request, Please try again after %d min %d.", min, sec)
+		message := fmt.Sprintf("Too many request, Please try again after %d days %d hours %d min %d.", day, hr, min, sec)
 
 		resp := &RateLimmiterResponse{
 			Message: message,

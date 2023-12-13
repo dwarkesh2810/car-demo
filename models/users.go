@@ -17,8 +17,8 @@ type Users struct {
 	Id        int64  `orm:"auto"`
 	FirstName string `orm:"size(128)" json:"first_name" form:"first_name"`
 	LastName  string `orm:"size(128)" json:"last_name" form:"last_name"`
-	Email     string `orm:"size(128)" json:"email" form:"email"`
-	Mobile    string `json:"mobile" form:"mobile"`
+	Email     string `orm:"size(128)" json:"email" form:"email" `
+	Mobile    string `json:"mobile" form:"mobile" `
 	Password  string `orm:"size(128)" json:"password" form:"password"`
 	Status    int    `orm:"" json:"status" form:"status"`
 	Role      string `orm:"size(20)" json:"role" form:"role"`

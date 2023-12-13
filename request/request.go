@@ -1,43 +1,43 @@
 package request
 
 type CreateUserRequest struct {
-	FirstName string ` json:"first_name" form:"first_name"`
-	LastName  string ` json:"last_name" form:"last_name"`
-	Email     string ` json:"email" form:"email"`
-	Mobile    string ` json:"mobile" form:"mobile"`
-	Password  string ` json:"password" form:"password"`
-	Role      string ` json:"role" form:"role"`
+	FirstName string ` json:"first_name" form:"first_name" valid:"Required; MaxSize(100)"`
+	LastName  string ` json:"last_name" form:"last_name" valid:"Required; MaxSize(100)"`
+	Email     string ` json:"email" form:"email" valid:"Required; Email; MaxSize(100)"`
+	Mobile    string ` json:"mobile" form:"mobile" valid:"Required; Mobile; MaxSize(20)"`
+	Password  string ` json:"password" form:"password" valid:"Required; MaxSize(100)"`
+	Role      string ` json:"role" form:"role" valid:"Required; MaxSize(20)"`
 	Otp       string `json:"otp" form:"otp"`
 }
 
 type UserUpdateRequest struct {
 	Id        int64  ` form:"id" json:"id"`
-	FirstName string ` json:"first_name" form:"first_name"`
-	LastName  string ` json:"last_name" form:"last_name"`
-	Email     string ` json:"email" form:"email"`
-	Mobile    string ` json:"mobile" form:"mobile"`
-	Role      string ` json:"role" form:"role"`
+	FirstName string ` json:"first_name" form:"first_name" valid:"Required; MaxSize(100)"`
+	LastName  string ` json:"last_name" form:"last_name" valid:"Required; MaxSize(100)"`
+	Email     string ` json:"email" form:"email" valid:"Required; Email; MaxSize(100)"`
+	Mobile    string ` json:"mobile" form:"mobile" valid:"Required; Mobile; MaxSize(20)"`
+	Role      string ` json:"role" form:"role" valid:"Required; MaxSize(20)"`
 }
 
 type UserLoginRequest struct {
-	Email    string `json:"email,omitempty" form:"email"`
-	Mobile   string `json:"mobile,omitempty" form:"mobile"`
-	Password string `json:"password" form:"password"`
+	Email    string `json:"email,omitempty" form:"email" valid:"Required; Email; MaxSize(100)"`
+	Mobile   string `json:"mobile,omitempty" form:"mobile" valid:"Mobile; MaxSize(20)"`
+	Password string `json:"password" form:"password" valid:"Required; MaxSize(100)"`
 }
 
 type ForgotPassword struct {
-	Email       string `form:"email" json:"email"`
-	Otp         string `form:"otp" json:"otp"`
-	NewPassword string `form:"new_password" json:"new_password"`
+	Email       string `form:"email" json:"email" valid:"Email; MaxSize(100)"`
+	Otp         string `form:"otp" json:"otp" valid:"Required"`
+	NewPassword string `form:"new_password" json:"new_password" valid:"Required; MaxSize(100)"`
 }
 
 type SendOTP struct {
-	Email string `form:"email" json:"email"`
+	Email string `form:"email" json:"email" valid:"Email; MaxSize(100)"`
 }
 
 type VerifyOTP struct {
-	Email string `form:"email" json:"email"`
-	Otp   string `form:"otp" json:"otp"`
+	Email string `form:"email" json:"email" valid:"Required; Email; MaxSize(100)"`
+	Otp   string `form:"otp" json:"otp" valid:"Required"`
 }
 
 type GetUserByID struct {
