@@ -23,6 +23,11 @@ type Response struct {
 	Error   string      `json:"error,omitempty"`
 }
 
+func Now(duration int64) string {
+	t := time.UnixMilli(duration)
+	return t.Format("2006-01-02 15:04:05")
+}
+
 func HashData(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
@@ -132,4 +137,10 @@ func MappedData(message string, data interface{}) map[string]interface{} {
 func LanguageTranslate(c beego.Controller, key string) string {
 	lang := c.Ctx.Input.GetData("lang").(string)
 	return i18n.Tr(lang, key)
+}
+
+func SecondsToMinutesAndSeconds(seconds int64) (int64, int64) {
+	minutes := seconds / 60
+	remainingSeconds := seconds % 60
+	return minutes, remainingSeconds
 }

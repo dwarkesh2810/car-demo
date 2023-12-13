@@ -28,5 +28,6 @@ func (dc *DatabaseCheck) isConnected() bool {
 		return false
 	}
 	err = orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
-	return err != nil
+
+	return !(err != nil)
 }
