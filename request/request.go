@@ -7,6 +7,7 @@ type CreateUserRequest struct {
 	Mobile    string ` json:"mobile" form:"mobile"`
 	Password  string ` json:"password" form:"password"`
 	Role      string ` json:"role" form:"role"`
+	Otp       string `json:"otp" form:"otp"`
 }
 
 type UserUpdateRequest struct {

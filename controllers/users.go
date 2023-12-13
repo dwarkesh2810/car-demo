@@ -52,11 +52,11 @@ func (uc *UsersController) Register() {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.userexist"))
 		return
 	}
+	userOTP := helper.GenerateOTP()
+	v.Otp = string(rune(userOTP))
 
 	if _, err := models.AddUsers(&v); err == nil {
-		// 	helper.JsonResponse(uc.Controller, http.StatusCreated, 1, u, "")
-		// helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
-
+		go helper.SendMail(v.Email, conf.EnvConfig.MailSubject, strconv.Itoa(userOTP))
 		T, _ := models.LastInsertedUser()
 		helper.JsonResponse(uc.Controller, http.StatusCreated, 1, helper.MappedData("user is created", dto.DtOUserResponse(T)), "")
 		return

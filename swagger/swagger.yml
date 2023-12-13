@@ -503,6 +503,8 @@ definitions:
         type: string
       mobile:
         type: string
+      otp:
+        type: string
       password:
         type: string
       role:

@@ -5,10 +5,13 @@ import (
 	"car_demo/models"
 	"encoding/csv"
 	"fmt"
+	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/beego/beego/v2/client/orm"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func ReadCSVFile(filePath string) ([]map[string]interface{}, error) {
@@ -74,4 +77,33 @@ func ImportFile(filePath string) {
 	if err != nil {
 		return
 	}
+}
+
+func Seed(records int) {
+	db := orm.NewOrm()
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte("12345"), 12)
+
+	if err != nil {
+		log.Fatal("hash password error")
+		return
+	}
+	for i := 0; i < records; i++ {
+		user := &models.Users{
+			FirstName: "dwarkesh" + strconv.Itoa(i),
+			LastName:  "patel" + strconv.Itoa(i),
+			Email:     "abcd" + strconv.Itoa(i) + "@mail.com",
+			Mobile:    "123456" + strconv.Itoa(i),
+			Password:  string(hashPassword),
+			Status:    0,
+			Role:      "user",
+			Otp:       strconv.Itoa(i),
+			CreatedAt: time.Now().UnixMilli(),
+		}
+		db.Insert(user)
+
+		time.Sleep(100 * time.Microsecond)
+	}
+
+	fmt.Println("seeder done")
+
 }

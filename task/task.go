@@ -43,4 +43,5 @@ func CreateTask(taskName, schedule string, f task.TaskFunc) {
 	tasks := task.NewTask(taskName, schedule, f)
 	task.AddTask(taskName, tasks)
 	task.StartTask()
+	// defer task.StopTask()
 }

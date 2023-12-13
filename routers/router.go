@@ -63,6 +63,7 @@ func init() {
 
 	beego.InsertFilter("/v1/car_master/create", beego.BeforeRouter, middleware.Auth)
 	beego.InsertFilter("*", beego.BeforeRouter, middleware.LanguageMiddleware)
+	beego.InsertFilter("*", beego.BeforeRouter, middleware.RateLimiter)
 	// beego.Router("v1/users/getone/?:id", uc, "get:GetOne")
 
 	beego.AddNamespace(ns)

@@ -15,6 +15,7 @@ type Config struct {
 	SmtpPort         string `mapstructure:"SMTP_PORT"`
 	BaseStoragePath  string `mapstructure:"BASE_STORAGE_PATH"`
 	MailSubject      string `mapstructure:"SUBJECT"`
+	RateLimiter      int    `mapstructure:"RATELIMITER"`
 }
 
 func LoadConfig(path, configName, configType string) (config Config, err error) {

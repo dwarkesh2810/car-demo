@@ -700,6 +700,9 @@
                 "mobile": {
                     "type": "string"
                 },
+                "otp": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 },
