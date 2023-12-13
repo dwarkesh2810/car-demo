@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/beego/beego/v2/core/validation"
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/beego/i18n"
 	"github.com/golang-jwt/jwt/v5"
@@ -27,6 +28,31 @@ type UsersController struct {
 	i18n.Locale
 }
 
+func init() {
+	validation.SetDefaultMessage(map[string]string{
+		"Required":     "Must be filled in",
+		"Min":          "Minimum allowed value %d",
+		"Max":          "Maximum allowed value %d",
+		"Range":        "Must be between %d and %d",
+		"MinSize":      "Minimum allowed length %d",
+		"MaxSize":      "Maximum allowed length %d",
+		"Length":       "Length must be %d",
+		"Alpha":        "Must consist of letters",
+		"Numeric":      "Must consist of numbers",
+		"AlphaNumeric": "Must consist of letters or numbers",
+		"Match":        "Must match %s",
+		"NoMatch":      "Must not match %s",
+		"AlphaDash":    "Must consist of letters, numbers or symbols (-_)",
+		"Email":        "Must be in correct email format",
+		"IP":           "Must be a valid IP address",
+		"Base64":       "Must be in correct base64 format",
+		"Mobile":       "Must be a valid mobile phone number",
+		"Tel":          "Must be a valid phone number",
+		"Phone":        "Must be a valid phone or mobile number",
+		"ZipCode":      "Must be a valid zip code",
+	})
+}
+
 // Register ...
 // @Title Post
 // @Description create Users
@@ -35,8 +61,7 @@ type UsersController struct {
 // @Failure 403 body is empty
 // @router /users/register [post]
 func (uc *UsersController) Register() {
-	logger.Init()
-	var v request.CreateUserRequest
+	v := request.CreateUserRequest{}
 	if err := uc.ParseForm(&v); err != nil {
 		// Handle error if parsing fails
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, helper.LanguageTranslate(uc.Controller, "error.parsing"))
@@ -44,6 +69,17 @@ func (uc *UsersController) Register() {
 	}
 
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
+	valid := validation.Validation{}
+
+	if isValid, _ := valid.Valid(&v); !isValid {
+		// Invalid data, retrieve error messages
+		for _, err := range valid.Errors {
+			// Handle validation errors
+			// For example, log the error messages
+			log.Print("1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111", err)
+		}
+		return
+	}
 
 	isExist := models.IsExistingUser(v.Email, v.Mobile)
 
