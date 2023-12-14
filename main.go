@@ -24,7 +24,7 @@ func init() {
 	conf.LoadEnv(".")
 	orm.RegisterDriver("postgres", orm.DRPostgres)
 	orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
-	// orm.RunSyncdb("default", false, true)
+	orm.RunSyncdb("default", false, true)
 	logger.Init()
 	// validations.Init()
 }

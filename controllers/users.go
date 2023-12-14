@@ -8,9 +8,9 @@ import (
 	"car_demo/models"
 	"car_demo/request"
 	"car_demo/validations"
+	"log"
 
 	"encoding/json"
-	"log"
 
 	"net/http"
 	"strconv"
@@ -46,6 +46,7 @@ func (uc *UsersController) Register() {
 
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 	valid := validation.Validation{}
+	validation.AddCustomFunc("InMobile", validations.IndianMobile)
 
 	if isValid, _ := valid.Valid(&v); !isValid {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, validations.ValidationErrorResponse(uc.Controller, valid.Errors))
