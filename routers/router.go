@@ -18,9 +18,9 @@ import (
 
 func init() {
 
-	langs := []string{"en-US", "zh-CN", "hi-IN"} // List of supported languages
+	Langs := []string{"en-US", "zh-CN", "hi-IN"} // List of supported languages
 
-	for _, lang := range langs {
+	for _, lang := range Langs {
 		if err := i18n.SetMessage(lang, "conf/locale_"+lang+".ini"); err != nil {
 			// logger.Error("Fail to set message file:", err)
 			logs.Error("Fail to set message file:", err)

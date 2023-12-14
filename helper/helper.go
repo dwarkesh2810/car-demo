@@ -22,7 +22,7 @@ import (
 type Response struct {
 	Success int         `json:"success"`
 	Data    interface{} `json:"data,omitempty"`
-	Error   string      `json:"error,omitempty"`
+	Error   interface{} `json:"error,omitempty"`
 }
 
 func Now(duration int64) string {
@@ -73,7 +73,7 @@ func GenerateOTP() int {
 	// Generate a random 6-digit number
 	return rand.Intn(900000) + 10000
 }
-func JsonResponse(c beego.Controller, statusCode int, success int, data interface{}, err string) {
+func JsonResponse(c beego.Controller, statusCode int, success int, data interface{}, err interface{}) {
 	var response Response = Response{
 		Success: success,
 		Data:    data,
@@ -138,6 +138,15 @@ func MappedData(message string, data interface{}) map[string]interface{} {
 
 func LanguageTranslate(c beego.Controller, key string) string {
 	lang := c.Ctx.Input.GetData("lang").(string)
+	language := strings.ToLower(lang)
+	switch language {
+	case "en-us", "en", "en-U", "US":
+		lang = "en-US"
+	case "hi-in", "hi", "hi-I", "IN":
+		lang = "hi-IN"
+	case "zh-cn", "zh", "zh-C", "CN":
+		lang = "zh-CN"
+	}
 	return i18n.Tr(lang, key)
 }
 
@@ -234,4 +243,8 @@ func GenerateMigration(field interface{}, name string, driver string, conn strin
 		return false
 	}
 	return true
+}
+
+func SliceToString(data []string) string {
+	return strings.Join(data, ",")
 }

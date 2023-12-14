@@ -78,8 +78,6 @@ func RateLimiter(ctx *context.Context) {
 		ctx.Output.Header("Content-Type", "application/json; charset=utf-8")
 		ctx.ResponseWriter.WriteHeader(http.StatusTooManyRequests)
 		ctx.ResponseWriter.Write(data)
-
-		log.Print("time blocked :", unBlocked[ip])
 		return
 	}
 }

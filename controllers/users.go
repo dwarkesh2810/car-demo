@@ -7,6 +7,7 @@ import (
 	"car_demo/logger"
 	"car_demo/models"
 	"car_demo/request"
+	"car_demo/validations"
 
 	"encoding/json"
 	"log"
@@ -28,31 +29,6 @@ type UsersController struct {
 	i18n.Locale
 }
 
-func init() {
-	validation.SetDefaultMessage(map[string]string{
-		"Required":     "Must be filled in",
-		"Min":          "Minimum allowed value %d",
-		"Max":          "Maximum allowed value %d",
-		"Range":        "Must be between %d and %d",
-		"MinSize":      "Minimum allowed length %d",
-		"MaxSize":      "Maximum allowed length %d",
-		"Length":       "Length must be %d",
-		"Alpha":        "Must consist of letters",
-		"Numeric":      "Must consist of numbers",
-		"AlphaNumeric": "Must consist of letters or numbers",
-		"Match":        "Must match %s",
-		"NoMatch":      "Must not match %s",
-		"AlphaDash":    "Must consist of letters, numbers or symbols (-_)",
-		"Email":        "Must be in correct email format",
-		"IP":           "Must be a valid IP address",
-		"Base64":       "Must be in correct base64 format",
-		"Mobile":       "Must be a valid mobile phone number",
-		"Tel":          "Must be a valid phone number",
-		"Phone":        "Must be a valid phone or mobile number",
-		"ZipCode":      "Must be a valid zip code",
-	})
-}
-
 // Register ...
 // @Title Post
 // @Description create Users
@@ -72,15 +48,12 @@ func (uc *UsersController) Register() {
 	valid := validation.Validation{}
 
 	if isValid, _ := valid.Valid(&v); !isValid {
-		// Invalid data, retrieve error messages
-		for _, err := range valid.Errors {
-			// Handle validation errors
-			// For example, log the error messages
-			log.Print("1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111", err)
-		}
+		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, validations.ValidationErrorResponse(uc.Controller, valid.Errors))
 		return
 	}
 
+	// validations.ValidationErrorResponse(uc.Controller, valid.Errors)
+	// validations.ValidErr(valid.Errors)
 	isExist := models.IsExistingUser(v.Email, v.Mobile)
 
 	if isExist {

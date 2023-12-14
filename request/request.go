@@ -1,10 +1,10 @@
 package request
 
 type CreateUserRequest struct {
-	FirstName string `json:"first_name" form:"first_name" valid:"Required;MaxSize(100)"`
+	FirstName string `json:"first_name" form:"first_name" valid:"Required;MinSize(3); MaxSize(100)"`
 	LastName  string `json:"last_name" form:"last_name" valid:"Required;MaxSize(100)"`
 	Email     string `json:"email" form:"email" valid:"Required; Email;MaxSize(100)"`
-	Mobile    string `json:"mobile" form:"mobile" valid:"Required;Mobile;MaxSize(20)"`
+	Mobile    string `json:"mobile" form:"mobile" valid:"Required;Numeric;MaxSize(20)"`
 	Password  string `json:"password" form:"password" valid:"Required;MaxSize(100)"`
 	Role      string `json:"role" form:"role" valid:"Required;MaxSize(20)"`
 	Otp       string `json:"otp" form:"otp"`
@@ -15,13 +15,13 @@ type UserUpdateRequest struct {
 	FirstName string `json:"first_name" form:"first_name" valid:"Required; MaxSize(100)"`
 	LastName  string `json:"last_name" form:"last_name" valid:"Required; MaxSize(100)"`
 	Email     string `json:"email" form:"email" valid:"Required; Email; MaxSize(100)"`
-	Mobile    string `json:"mobile" form:"mobile" valid:"Required; Mobile; MaxSize(20)"`
+	Mobile    string `json:"mobile" form:"mobile" valid:"Required; Numeric; MaxSize(20)"`
 	Role      string `json:"role" form:"role" valid:"Required; MaxSize(20)"`
 }
 
 type UserLoginRequest struct {
 	Email    string `json:"email,omitempty" form:"email" valid:"Required; Email; MaxSize(100)"`
-	Mobile   string `json:"mobile,omitempty" form:"mobile" valid:"Mobile; MaxSize(20)"`
+	Mobile   string `json:"mobile,omitempty" form:"mobile" valid:"Numeric; MaxSize(20)"`
 	Password string `json:"password" form:"password" valid:"Required; MaxSize(100)"`
 }
 

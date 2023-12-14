@@ -6,6 +6,8 @@ import (
 	"car_demo/logger"
 	_ "car_demo/routers"
 	"car_demo/task"
+	"car_demo/validations"
+
 	"context"
 	"log"
 
@@ -25,6 +27,7 @@ func init() {
 	orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
 	// orm.RunSyncdb("default", false, true)
 	logger.Init()
+	validations.Init()
 }
 
 func main() {
