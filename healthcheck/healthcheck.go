@@ -4,10 +4,9 @@ import (
 	_ "car_demo/routers"
 	"errors"
 
-	"github.com/beego/beego/v2/client/orm"
-
 	// // _ "github.com/beego/beego/v2/server/web/swagger"
 
+	"github.com/beego/beego/v2/client/orm"
 	_ "github.com/lib/pq"
 )
 
@@ -23,11 +22,9 @@ func (dc *DatabaseCheck) Check() error {
 }
 
 func (dc *DatabaseCheck) isConnected() bool {
-	err := orm.RegisterDriver("postgres", orm.DRPostgres)
-	if err != nil {
+	o := orm.NewOrm()
+	if _, err := o.Raw("SELECT 1").Exec(); err != nil {
 		return false
 	}
-	err = orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
-
-	return !(err != nil)
+	return true
 }

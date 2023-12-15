@@ -14,3 +14,6 @@ logs
 output.csv
 output.pdf
 output.xlsx
+
+# docker-compose.yaml
+# Dockerfile

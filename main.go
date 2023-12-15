@@ -3,6 +3,8 @@ package main
 import (
 	"car_demo/conf"
 	"car_demo/healthcheck"
+	"car_demo/validations"
+
 	"car_demo/logger"
 	_ "car_demo/routers"
 	"car_demo/task"
@@ -20,13 +22,15 @@ import (
 )
 
 func init() {
-
 	conf.LoadEnv(".")
 	orm.RegisterDriver("postgres", orm.DRPostgres)
-	orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
+
+	orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres host=postgres_db sslmode=disable")
+	// orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
+
 	orm.RunSyncdb("default", false, true)
 	logger.Init()
-	// validations.Init()
+	validations.Init()
 }
 
 func main() {
