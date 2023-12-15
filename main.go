@@ -25,8 +25,8 @@ func init() {
 	conf.LoadEnv(".")
 	orm.RegisterDriver("postgres", orm.DRPostgres)
 
-	orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres host=postgres_db sslmode=disable")
-	// orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
+	// orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres host=postgres_db sslmode=disable")
+	orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
 
 	orm.RunSyncdb("default", false, true)
 	logger.Init()
@@ -38,6 +38,7 @@ func main() {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
+	// helper.TotalRecords("users")
 	admin.AddHealthCheck("database", &healthcheck.DatabaseCheck{})
 	task.CreateTask("test1", "0 */1 * * * *", Demo)
 	beego.Run()

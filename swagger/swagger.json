@@ -263,7 +263,7 @@
                     {
                         "in": "header",
                         "name": "Accept-Language",
-                        "description": "Bearer YourAccessToken",
+                        "description": "Please enter language",
                         "type": "string"
                     }
                 ],
@@ -371,8 +371,8 @@
                     },
                     {
                         "in": "query",
-                        "name": "offset",
-                        "description": "Start position of result set. Must be an integer",
+                        "name": "page",
+                        "description": "Page Number",
                         "type": "string"
                     }
                 ],

@@ -46,7 +46,7 @@ func (uc *UsersController) Register() {
 
 	json.Unmarshal(uc.Ctx.Input.RequestBody, &v)
 	valid := validation.Validation{}
-	
+
 	if isValid, _ := valid.Valid(&v); !isValid {
 		helper.JsonResponse(uc.Controller, http.StatusBadRequest, 0, nil, validations.ValidationErrorResponse(uc.Controller, valid.Errors))
 		return
@@ -106,7 +106,7 @@ func (uc *UsersController) GetOne() {
 // @Param	sortby	query	string	false	"Sorted-by fields. e.g. col1,col2 ..."
 // @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
 // @Param	limit	query	string	false	"Limit the size of result set. Must be an integer"
-// @Param	offset	query	string	false	"Start position of result set. Must be an integer"
+// @Param	page	query	string	false	"Page Number"
 // @Success 200 {object} models.Users
 // @Failure 403
 // @Failure 400
@@ -116,20 +116,21 @@ func (uc *UsersController) GetAll() {
 	var sortby []string
 	var order []string
 	var query = make(map[string]string)
-	var limit int64 = 10
+	var limit int64 = 5
+	var page int64
+	if v, err := uc.GetInt64("page"); err == nil {
+		page = v
+	}
 	var offset int64
 
 	// fields: col1,col2,entity.col3
 	if v := uc.GetString("fields"); v != "" {
+		log.Print(v)
 		fields = strings.Split(v, ",")
 	}
 	// limit: 10 (default is 10)
 	if v, err := uc.GetInt64("limit"); err == nil {
 		limit = v
-	}
-	// offset: 0 (default is 0)
-	if v, err := uc.GetInt64("offset"); err == nil {
-		offset = v
 	}
 	// sortby: col1,col2
 	if v := uc.GetString("sortby"); v != "" {
@@ -139,6 +140,8 @@ func (uc *UsersController) GetAll() {
 	if v := uc.GetString("order"); v != "" {
 		order = strings.Split(v, ",")
 	}
+
+	offset = (page - 1) * limit
 	// query: k:v,k:v
 	if v := uc.GetString("query"); v != "" {
 		for _, cond := range strings.Split(v, ",") {
@@ -403,7 +406,7 @@ func (c *UsersController) DemoSet() {
 // DemoGet ...
 // @Title DemoGet
 // @DescriptionDemoGet
-// @Param   Accept-Language  header  string  false  "Bearer YourAccessToken"
+// @Param   Accept-Language  header  string  false  "Please enter language"
 // @Success 200 {int} string
 // @Failure 403 body is empty
 // @Failure 400
