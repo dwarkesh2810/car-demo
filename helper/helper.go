@@ -69,8 +69,6 @@ func GetTokenFromHeader(c *context.Context) (string, error) {
 
 func GenerateOTP() int {
 	rand.Seed(time.Now().UnixNano())
-
-	// Generate a random 6-digit number
 	return rand.Intn(900000) + 10000
 }
 func JsonResponse(c beego.Controller, statusCode int, success int, data interface{}, err interface{}) {
@@ -82,6 +80,19 @@ func JsonResponse(c beego.Controller, statusCode int, success int, data interfac
 	c.Ctx.Output.SetStatus(statusCode)
 	c.Data["json"] = response
 	c.ServeJSON()
+}
+
+func GetFileExtensionFromForm(c *context.Context, file string) (string, error) {
+	_, hd, err := c.Request.FormFile(file)
+	if err != nil {
+		return "", err
+	}
+
+	fileName := hd.Filename
+
+	splitFileName := strings.Split(fileName, ".")
+
+	return splitFileName[1], nil
 }
 
 func GetFileAndStore(uc beego.Controller, file string, pathName string, path string) (string, error) {
@@ -248,53 +259,3 @@ func GenerateMigration(field interface{}, name string, driver string, conn strin
 func SliceToString(data []string) string {
 	return strings.Join(data, ",")
 }
-
-// type Pagination struct {
-// 	previousPage   int64
-// 	currentPage    int64
-// 	nextPage       int64
-// 	lastPage       int64
-// 	perpageRecords int64
-// 	totalPages     int64
-// 	totalRecords   int64
-// }
-
-// func setPagination(previousPage, currentPage, nextPage, lastPage, perpageRecords, totalPages, totalRecords int64) *Pagination {
-// 	return &Pagination{
-// 		previousPage:   previousPage,
-// 		currentPage:    currentPage,
-// 		nextPage:       nextPage,
-// 		lastPage:       lastPage,
-// 		perpageRecords: perpageRecords,
-// 		totalPages:     totalPages,
-// 		totalRecords:   totalRecords,
-// 	}
-// }
-
-// func previousPage(currentPage int64) int64 {
-// 	return currentPage - 1
-// }
-
-// func nextPage(currentPage int64) int64 {
-// 	return currentPage + 1
-// }
-
-// func lastPage(counts, perPageRecord int64) int64 {
-// 	if counts%perPageRecord != 0 {
-// 		return (counts / perPageRecord) + 1
-// 	}
-// 	return counts / perPageRecord
-// }
-
-// func totalPages(counts, perPageRecord int64) int64 {
-// 	return lastPage(counts, perPageRecord)
-// }
-
-// // func TotalRecords(tableName string) int64 {
-
-// // }
-
-// func Paginations() *Pagination {
-
-// 	return nil
-// }

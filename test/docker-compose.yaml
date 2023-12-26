@@ -11,7 +11,7 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=1234
       - PGSSLMODE=disable
-      - TZ=Asia/Kolkata # Set the timezone to IST
+      - TZ=UTC # Set the timezone to IST
     networks:
       - car_demo_network_compose
     ports:

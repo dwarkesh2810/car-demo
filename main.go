@@ -18,15 +18,20 @@ import (
 	// // _ "github.com/beego/beego/v2/server/web/swagger"
 
 	beego "github.com/beego/beego/v2/server/web"
+	_ "github.com/beego/beego/v2/server/web/session/postgres"
 	_ "github.com/lib/pq"
 )
 
 func init() {
 	conf.LoadEnv(".")
+
 	orm.RegisterDriver("postgres", orm.DRPostgres)
 
-	// orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres host=postgres_db sslmode=disable")
-	orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres sslmode=disable")
+	orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=postgres host=postgres_db sslmode=disable")
+	// orm.RegisterDataBase("default", "postgres", "user=root password=1234 dbname=golang_demo sslmode=disable")
+	// beego.BConfig.WebConfig.Session.SessionOn = true
+	// beego.BConfig.WebConfig.Session.SessionProvider = "postgresql"
+	// beego.BConfig.WebConfig.Session.SessionProviderConfig = "postgres://root:1234@localhost/postgres?sslmode=disable"
 
 	orm.RunSyncdb("default", false, true)
 	logger.Init()

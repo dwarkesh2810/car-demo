@@ -13,21 +13,21 @@ func Init() {
 }
 
 func Error(message string, err error) {
-	log.Error("%s -----> %v", message, err)
+	log.Error("%s -------------------------------------------> %v", message, err)
 }
 
-func Info(message string, data string) {
-	log.Info("%s-----> %s", data)
+func Info(message string, info string) {
+	log.Info("%s---------------------------------------------> %s", message, info)
 }
 
 func Debug(message string) {
 	log.Debug(message)
 }
 
-func Alert(message string, data string) {
-	log.Alert("%s -----> %v", message, data)
+func Alert(message string, alert string) {
+	log.Alert("%s -------------------------------------------> %v", message, alert)
 }
 
-func Warning(message string, data string) {
-	log.Warning("%s -----> %v", message, data)
+func Warning(message string, warning string) {
+	log.Warning("%s ------------------------------------------> %v", message, warning)
 }

@@ -4,8 +4,6 @@ import (
 	_ "car_demo/routers"
 	"errors"
 
-	// // _ "github.com/beego/beego/v2/server/web/swagger"
-
 	"github.com/beego/beego/v2/client/orm"
 	_ "github.com/lib/pq"
 )
